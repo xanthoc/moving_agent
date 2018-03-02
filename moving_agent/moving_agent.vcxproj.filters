@@ -33,6 +33,12 @@
     <ClInclude Include="GameWorld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MyClock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -42,6 +48,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyClock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

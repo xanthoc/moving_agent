@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "moving_agent.h"
 #include "GameWorld.h"
+#include "MyClock.h"
+#include "MyConfig.h"
 
 #define MAX_LOADSTRING 100
 
@@ -43,10 +45,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_MOVING_AGENT));
 
     MSG msg;
+	bool msg_loop_cont = true;
 
-	while (true) {
+	while (msg_loop_cont) {
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) { // PeekMessage will return false when there is no message
-			if (msg.message == WM_QUIT) break; // GetMessage will return false when it retrieves WM_QUIT
+			if (msg.message == WM_QUIT) {
+				msg_loop_cont = false;
+				break; // GetMessage will return false when it retrieves WM_QUIT
+			}
 			if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
 			{
 				TranslateMessage(&msg);
@@ -54,7 +60,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			}
 		}
 		// we can do here something
-		gWorld.update();
+		long delta = my_clock.delta_msec();
+		if (delta > my_config.time_delta()) {
+			gWorld.update();
+			my_clock.update();
+			InvalidateRect(msg.hwnd, nullptr, true);
+		}
+		else {
+			Sleep(my_config.time_quantum());
+		}
 	}
 
     return (int) msg.wParam;
@@ -152,6 +166,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
+			gWorld.render(hdc);
             EndPaint(hWnd, &ps);
         }
         break;
