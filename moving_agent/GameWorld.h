@@ -16,10 +16,10 @@ public:
 		long cx = tm.tmAveCharWidth;
 		long cy = tm.tmExternalLeading + tm.tmHeight;
 		TextOut(hdc, cx, cy, buf, wsprintf(buf, TEXT("Time Quantum = %d ms"), my_config.time_quantum()));
-		TextOut(hdc, cx, 2*cy, buf, wsprintf(buf, TEXT("Time Delta = %d ms"), my_config.time_delta()));
+		TextOut(hdc, cx, 2*cy, buf, wsprintf(buf, TEXT("Time Delta = %d ms  Left(-) / Right(+)"), my_config.time_delta()));
+		SetTextColor(hdc, ori_color);
 		long tmp = my_clock.total_msec();
 		TextOut(hdc, cx, 3*cy, buf, wsprintf(buf, TEXT("Time elapsed = %d.%d ms"), tmp/1000, tmp%1000));
-		SetTextColor(hdc, ori_color);
 	}
 };
 

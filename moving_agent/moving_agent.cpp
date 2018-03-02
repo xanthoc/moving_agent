@@ -161,6 +161,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+	case WM_KEYDOWN:
+		{
+			switch (wParam) {
+				case VK_LEFT:
+					{
+						my_config.set_time_delta(my_config.time_delta() / 2);
+						if (my_config.time_delta() == 0) my_config.set_time_delta(1);
+					}
+					break;
+				case VK_RIGHT:
+					{
+						my_config.set_time_delta(my_config.time_delta() * 2);
+					}
+					break;
+			}
+		}
+		break;
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
