@@ -145,16 +145,23 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseGameEntity.h" />
     <ClInclude Include="GameWorld.h" />
+    <ClInclude Include="MovingEntity.h" />
     <ClInclude Include="moving_agent.h" />
     <ClInclude Include="MyClock.h" />
     <ClInclude Include="MyConfig.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SteeringBehavior.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Vector2D.h" />
+    <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BaseGameEntity.cpp" />
     <ClCompile Include="GameWorld.cpp" />
+    <ClCompile Include="MovingEntity.cpp" />
     <ClCompile Include="moving_agent.cpp" />
     <ClCompile Include="MyClock.cpp" />
     <ClCompile Include="MyConfig.cpp" />
@@ -164,6 +171,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SteeringBehavior.cpp" />
+    <ClCompile Include="Vector2D.cpp" />
+    <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="moving_agent.rc" />

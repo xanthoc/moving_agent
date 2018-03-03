@@ -62,7 +62,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		// we can do here something
 		long delta = my_clock.delta_msec();
 		if (delta > my_config.time_delta()) {
-			gWorld.update();
+			gWorld.update(delta/1000.0);
 			my_clock.update();
 			InvalidateRect(msg.hwnd, nullptr, true);
 		}
@@ -161,6 +161,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+	case WM_SIZE:
+		{
+			gWorld.set_width(LOWORD(lParam));
+			gWorld.set_height(HIWORD(lParam));
+		}
+		break;
 	case WM_KEYDOWN:
 		{
 			switch (wParam) {

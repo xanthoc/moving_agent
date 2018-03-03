@@ -1,25 +1,22 @@
 #pragma once
 #include "MyConfig.h"
 #include "MyClock.h"
+#include "Vehicle.h"
 
 class GameWorld
 {
+	Vehicle *m_vehicle;
+	int m_width;
+	int m_height;
 public:
 	GameWorld();
 	~GameWorld();
-	void update() {}
-	void render(HDC hdc) {
-		COLORREF ori_color = SetTextColor(hdc, RGB(128, 128, 128));
-		TCHAR buf[512];
-		TEXTMETRIC tm;
-		GetTextMetrics(hdc, &tm);
-		long cx = tm.tmAveCharWidth;
-		long cy = tm.tmExternalLeading + tm.tmHeight;
-		TextOut(hdc, cx, cy, buf, wsprintf(buf, TEXT("Time Quantum = %d ms"), my_config.time_quantum()));
-		TextOut(hdc, cx, 2*cy, buf, wsprintf(buf, TEXT("Time Delta = %d ms  Left(-) / Right(+)"), my_config.time_delta()));
-		SetTextColor(hdc, ori_color);
-		long tmp = my_clock.total_msec();
-		TextOut(hdc, cx, 3*cy, buf, wsprintf(buf, TEXT("Time elapsed = %d.%d ms"), tmp/1000, tmp%1000));
-	}
+	int width() const { return m_width; }
+	int height() const { return m_height; }
+	void set_width(int val) { m_width = val; }
+	void set_height(int val) { m_height = val; }
+	void update(double time_elapsed);
+	void render(HDC hdc);
+
 };
 
