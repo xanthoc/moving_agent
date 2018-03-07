@@ -2,7 +2,7 @@
 #include "Vehicle.h"
 #include "GameWorld.h"
 
-Vehicle::Vehicle(GameWorld *world) : m_world(world), m_steering(new SteeringBehavior)
+Vehicle::Vehicle(GameWorld *world) : m_world(world), m_steering(new SteeringBehavior(this))
 {
 }
 
@@ -23,7 +23,7 @@ void Vehicle::update(double time_elapsed) {
 		m_heading = m_velocity.get_normalized();
 		m_side = m_heading.get_perp();
 	}
-	m_pos.wrap_around(m_world->width(), m_world->height());
+	m_pos.wrap_around(-m_world->width() / 2, m_world->width() / 2, -m_world->height() / 2, m_world->height() / 2);
 }
 
 
@@ -33,5 +33,6 @@ void Vehicle::render(HDC hdc) {
 	GetTextMetrics(hdc, &tm);
 	long cx = tm.tmAveCharWidth;
 	long cy = tm.tmHeight + tm.tmExternalLeading;
-	TextOut(hdc, cx, m_world->height()-cy, buf, wsprintf(buf, TEXT("Position of the vehicle is (%d, %d)"), m_pos.x(), m_pos.y()));
+	TextOut(hdc, -m_world->width()/2+cx, -m_world->height()/2+cy, buf, wsprintf(buf, TEXT("Position of the vehicle is (%d, %d)"), m_pos.x(), m_pos.y()));
+	Ellipse(hdc, m_pos.x() - 5, m_pos.y() - 5, m_pos.x() + 5, m_pos.y() + 5);
 }

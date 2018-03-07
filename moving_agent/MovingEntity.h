@@ -15,5 +15,12 @@ protected:
 public:
 	MovingEntity();
 	virtual ~MovingEntity();
+	Vector2D& velocity() { return m_velocity; }
+	Vector2D& heading() { return m_heading; }
+	Vector2D& side() { return m_side; }
+	double mass() const { return m_mass; }
+	double max_speed() const { return m_max_speed; }
+	double max_force() const { return m_max_force; }
+	double max_turn_rate() const { return m_max_turn_rate; }
 };
 

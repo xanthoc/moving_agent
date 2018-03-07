@@ -26,11 +26,11 @@ public:
 			m_y *= val/len;
 		}
 	}
-	void wrap_around(int width, int height) {
-		if (m_x > width) m_x -= width;
-		if (m_x < 0) m_x += width;
-		if (m_y > height) m_y -= height;
-		if (m_y < 0) m_y += height;
+	void wrap_around(int left, int right, int bottom, int top) {
+		if (m_x > right) m_x = left;
+		if (m_x < left) m_x = right;
+		if (m_y > top) m_y = bottom;
+		if (m_y < bottom) m_y = top;
 	}
 	Vector2D get_perp() const {
 		Vector2D res;
@@ -56,6 +56,12 @@ public:
 		Vector2D res;
 		res.m_x = m_x * val;
 		res.m_y = m_y * val;
+		return res;
+	}
+	Vector2D operator-(const Vector2D &other) const {
+		Vector2D res;
+		res.m_x = m_x - other.m_x;
+		res.m_y = m_y - other.m_y;
 		return res;
 	}
 	Vector2D& operator+=(const Vector2D &other) {

@@ -8,5 +8,6 @@ protected:
 public:
 	BaseGameEntity();
 	virtual ~BaseGameEntity();
+	Vector2D& pos() { return m_pos; }
 };
 
