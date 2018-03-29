@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SteeringBehavior.h"
 #include "Vehicle.h"
+#include "GameWorld.h"
 
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle) 
@@ -16,7 +17,7 @@ SteeringBehavior::~SteeringBehavior()
 Vector2D SteeringBehavior::calculate() {
 	Vector2D force;
 	if (true) {
-		Vector2D tmp = seek(Vector2D(-50, 50));
+		Vector2D tmp = seek(m_vehicle->world()->target());
 		if (!accumulate_force(force, tmp)) return force;
 	}
 	return force;

@@ -8,6 +8,9 @@ class GameWorld
 	Vehicle *m_vehicle;
 	int m_width;
 	int m_height;
+	Vector2D m_target;
+	HBITMAP m_crosshair;
+	HDC m_hdcmem;
 public:
 	GameWorld();
 	~GameWorld();
@@ -15,6 +18,8 @@ public:
 	int height() const { return m_height; }
 	void set_width(int val) { m_width = val; }
 	void set_height(int val) { m_height = val; }
+	Vector2D target() { return m_target; }
+	void set_target(int x, int y) { m_target = Vector2D(x, y); }
 	void update(double time_elapsed);
 	void render(HDC hdc);
 

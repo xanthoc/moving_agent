@@ -161,6 +161,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+	case WM_LBUTTONDOWN:
+		{
+			int x = LOWORD(lParam);
+			int y = HIWORD(lParam);
+			gWorld.set_target(x, y);
+		}
+		break;
 	case WM_SIZE:
 		{
 			gWorld.set_width(LOWORD(lParam));
@@ -190,7 +197,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
 			gWorld.render(hdc);
-            EndPaint(hWnd, &ps);
+			EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:

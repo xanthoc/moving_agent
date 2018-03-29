@@ -10,6 +10,7 @@ private:
 	GameWorld *m_world;
 	SteeringBehavior *m_steering;
 public:
+	GameWorld* world() { return m_world; }
 	Vehicle(GameWorld *world);
 	virtual ~Vehicle();
 	void update(double time_elapsed);

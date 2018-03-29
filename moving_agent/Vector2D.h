@@ -29,8 +29,8 @@ public:
 	void wrap_around(int left, int right, int bottom, int top) {
 		if (m_x > right) m_x = left;
 		if (m_x < left) m_x = right;
-		if (m_y > top) m_y = bottom;
-		if (m_y < bottom) m_y = top;
+		if (m_y < top) m_y = bottom;
+		if (m_y > bottom) m_y = top;
 	}
 	Vector2D get_perp() const {
 		Vector2D res;
