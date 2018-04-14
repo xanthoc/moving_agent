@@ -142,6 +142,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	static HDC hdcmem;
+	static HBITMAP old_bitmap;
+
     switch (message)
     {
     case WM_COMMAND:
@@ -161,6 +164,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+	case WM_CREATE:
+		{
+			hdcmem = CreateCompatibleDC(NULL);
+			HDC hdc = GetDC(hWnd);
+			RECT rect;
+			GetClientRect(hWnd, &rect);
+			HBITMAP hbitmap = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
+			old_bitmap = (HBITMAP)SelectObject(hdcmem, hbitmap);
+			ReleaseDC(hWnd, hdc);
+		}
+		break;
 	case WM_LBUTTONDOWN:
 		{
 			int x = LOWORD(lParam);
@@ -196,13 +210,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
-			gWorld.render(hdc);
+			BitBlt(hdcmem, 0, 0, gWorld.width(), gWorld.height(), NULL, NULL, NULL, WHITENESS);
+			gWorld.render(hdcmem);
+			BitBlt(hdc, 0, 0, gWorld.width(), gWorld.height(), hdcmem, 0, 0, SRCCOPY);
 			EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:
+		old_bitmap = (HBITMAP)SelectObject(hdcmem, old_bitmap);
+		DeleteObject(old_bitmap);
+		DeleteDC(hdcmem);
         PostQuitMessage(0);
         break;
+	case WM_ERASEBKGND:
+		break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

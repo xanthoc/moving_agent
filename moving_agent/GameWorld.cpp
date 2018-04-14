@@ -6,15 +6,16 @@ GameWorld::GameWorld() {
 	m_vehicle = new Vehicle(this);
 	m_crosshair = (HBITMAP)LoadImage(nullptr, TEXT("..\\crosshair.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	m_hdcmem = CreateCompatibleDC(nullptr);
-	SelectObject(m_hdcmem, m_crosshair);
+	m_old_crosshair = (HBITMAP)SelectObject(m_hdcmem, m_crosshair);
 	m_target = Vector2D(100, 200);
 }
 
 
 GameWorld::~GameWorld()
 {
-	DeleteDC(m_hdcmem);
+	SelectObject(m_hdcmem, m_old_crosshair);
 	DeleteObject(m_crosshair);
+	DeleteDC(m_hdcmem);
 }
 
 
@@ -42,10 +43,10 @@ void GameWorld::render(HDC hdc) {
 	TextOut(hdc, cx, cy, buf, wsprintf(buf, TEXT("Time Quantum = %d ms"), my_config.time_quantum()));
 	TextOut(hdc, cx, 2 * cy, buf, wsprintf(buf, TEXT("Time Delta = %d ms  Left(-) / Right(+)"), my_config.time_delta()));
 	long tmp = my_clock.total_msec();
-	TextOut(hdc, cx, 3 * cy, buf, wsprintf(buf, TEXT("Time elapsed = %d.%d ms"), tmp / 1000, tmp % 1000));
+	TextOut(hdc, cx, 3 * cy, buf, wsprintf(buf, TEXT("Time elapsed = %d.%d s"), tmp / 1000, tmp % 1000));
 	SetTextColor(hdc, ori_color);
 
-	BitBlt(hdc, m_target.x()-57/2, m_target.y()-57/2, 57, 57, m_hdcmem, 0, 0, SRCCOPY);
+	BitBlt(hdc, (int)(m_target.x()-57/2), (int)(m_target.y()-57/2), 57, 57, m_hdcmem, 0, 0, SRCCOPY);
 
 	m_vehicle->render(hdc);
 }

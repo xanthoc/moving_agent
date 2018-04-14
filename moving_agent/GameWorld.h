@@ -9,7 +9,7 @@ class GameWorld
 	int m_width;
 	int m_height;
 	Vector2D m_target;
-	HBITMAP m_crosshair;
+	HBITMAP m_crosshair, m_old_crosshair;
 	HDC m_hdcmem;
 public:
 	GameWorld();

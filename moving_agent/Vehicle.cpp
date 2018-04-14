@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "Vehicle.h"
 #include "GameWorld.h"
+#include <vector>
+#include "Vector2D.h"
 
 Vehicle::Vehicle(GameWorld *world) : m_world(world), m_steering(new SteeringBehavior(this))
 {
+	m_scale = Vector2D(10.0, 10.0);
 }
 
 
@@ -33,6 +36,37 @@ void Vehicle::render(HDC hdc) {
 	GetTextMetrics(hdc, &tm);
 	long cx = tm.tmAveCharWidth;
 	long cy = tm.tmHeight + tm.tmExternalLeading;
-	TextOut(hdc, cx, m_world->height()-cy, buf, wsprintf(buf, TEXT("Position of the vehicle is (%d, %d)"), m_pos.x(), m_pos.y()));
-	Ellipse(hdc, m_pos.x() - 5, m_pos.y() - 5, m_pos.x() + 5, m_pos.y() + 5);
+	TextOut(hdc, cx, m_world->height()-cy, buf, wsprintf(buf, TEXT("Position of the vehicle is (%d, %d)"), (int)m_pos.x(), (int)m_pos.y()));
+	//Ellipse(hdc, m_pos.x() - 5, m_pos.y() - 5, m_pos.x() + 5, m_pos.y() + 5);
+
+	std::vector<Vector2D> pts;
+	pts.push_back(Vector2D(-1.0, 0.6));
+	pts.push_back(Vector2D(-1.0, -0.6));
+	pts.push_back(Vector2D(1.0, 0));
+
+	// scale
+	for (unsigned int i = 0; i < pts.size(); ++i) {
+		double x = m_scale.x()*pts[i].x();
+		double y = m_scale.y()*pts[i].y();
+		pts[i] = Vector2D(x, y);
+	}
+
+	// rotate
+	for (unsigned int i = 0; i < pts.size(); ++i) {
+		double x = m_heading.x()*pts[i].x() + m_side.x()*pts[i].y();
+		double y = m_heading.y()*pts[i].x() + m_side.y()*pts[i].y();
+		pts[i] = Vector2D(x, y);
+	}
+
+	// translate
+	for (unsigned int i = 0; i < pts.size(); ++i) {
+		pts[i] += m_pos;
+	}
+
+	MoveToEx(hdc, (int)pts[0].x(), (int)pts[0].y(), nullptr);
+	for (unsigned int p = 1; p<pts.size(); ++p) {
+		LineTo(hdc, (int)pts[p].x(), (int)pts[p].y());
+	}
+	LineTo(hdc, (int)pts[0].x(), (int)pts[0].y());
+
 }

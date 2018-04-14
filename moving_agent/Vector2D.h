@@ -10,8 +10,8 @@ public:
 	Vector2D();
 	Vector2D(double x, double y);
 	~Vector2D();
-	int x() const { return static_cast<int>(m_x); }
-	int y() const { return static_cast<int>(m_y); }
+	double x() const { return m_x; }
+	double y() const { return m_y; }
 	double length() const {
 		return sqrt(m_x*m_x + m_y*m_y);
 	}
