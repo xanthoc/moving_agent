@@ -31,12 +31,6 @@ void Vehicle::update(double time_elapsed) {
 
 
 void Vehicle::render(HDC hdc) {
-	TCHAR buf[512];
-	TEXTMETRIC tm;
-	GetTextMetrics(hdc, &tm);
-	long cx = tm.tmAveCharWidth;
-	long cy = tm.tmHeight + tm.tmExternalLeading;
-	TextOut(hdc, cx, m_world->height()-cy, buf, wsprintf(buf, TEXT("Position of the vehicle is (%d, %d)"), (int)m_pos.x(), (int)m_pos.y()));
 	//Ellipse(hdc, m_pos.x() - 5, m_pos.y() - 5, m_pos.x() + 5, m_pos.y() + 5);
 
 	std::vector<Vector2D> pts;

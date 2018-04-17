@@ -15,5 +15,7 @@ public:
 	virtual ~Vehicle();
 	void update(double time_elapsed);
 	void render(HDC hdc);
+	void set_seek(bool val) { m_steering->set_seek(val); }
+	void set_flee(bool val) { m_steering->set_flee(val); }
 };
 

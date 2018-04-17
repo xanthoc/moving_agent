@@ -4,7 +4,7 @@
 #include "GameWorld.h"
 
 
-SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle) 
+SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), m_seek_flag(false), m_flee_flag(false)
 {
 }
 
@@ -16,7 +16,11 @@ SteeringBehavior::~SteeringBehavior()
 
 Vector2D SteeringBehavior::calculate() {
 	Vector2D force;
-	if (true) {
+	if (m_flee_flag) {
+		Vector2D tmp = flee(m_vehicle->world()->wolf()->pos());
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_seek_flag) {
 		Vector2D tmp = seek(m_vehicle->world()->target());
 		if (!accumulate_force(force, tmp)) return force;
 	}
@@ -42,4 +46,14 @@ Vector2D SteeringBehavior::seek(const Vector2D &target_pos) {
 	res = res.get_normalized();
 	res = res * m_vehicle->max_speed();
 	return res - m_vehicle->velocity();
+}
+
+Vector2D SteeringBehavior::flee(const Vector2D &target_pos) {
+	Vector2D distance = m_vehicle->pos() - target_pos;
+	if (distance.length_sq() > 100.0*100.0) {
+		return Vector2D(0.0, 0.0);
+	}
+	distance = distance.get_normalized();
+	distance = distance * m_vehicle->max_speed();
+	return distance - m_vehicle->velocity();
 }

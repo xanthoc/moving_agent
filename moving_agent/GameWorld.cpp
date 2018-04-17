@@ -3,7 +3,12 @@
 
 
 GameWorld::GameWorld() {
-	m_vehicle = new Vehicle(this);
+	m_sheep = new Vehicle(this);
+	m_sheep->set_seek(true);
+	m_sheep->set_flee(true);
+	m_wolf = new Vehicle(this);
+	m_wolf->set_seek(true);
+	m_wolf->pos() = Vector2D(100, 100);
 	m_crosshair = (HBITMAP)LoadImage(nullptr, TEXT("..\\crosshair.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	m_hdcmem = CreateCompatibleDC(nullptr);
 	m_old_crosshair = (HBITMAP)SelectObject(m_hdcmem, m_crosshair);
@@ -16,11 +21,14 @@ GameWorld::~GameWorld()
 	SelectObject(m_hdcmem, m_old_crosshair);
 	DeleteObject(m_crosshair);
 	DeleteDC(m_hdcmem);
+	delete m_wolf;
+	delete m_sheep;
 }
 
 
 void GameWorld::update(double time_elapsed) {
-	m_vehicle->update(time_elapsed);
+	m_sheep->update(time_elapsed);
+	m_wolf->update(time_elapsed);
 }
 
 void GameWorld::render(HDC hdc) {
@@ -46,7 +54,16 @@ void GameWorld::render(HDC hdc) {
 	TextOut(hdc, cx, 3 * cy, buf, wsprintf(buf, TEXT("Time elapsed = %d.%d s"), tmp / 1000, tmp % 1000));
 	SetTextColor(hdc, ori_color);
 
+	TextOut(hdc, cx, height() - cy, buf, wsprintf(buf, TEXT("Position of the wolf is (%d, %d)"), (int)(m_wolf->pos().x()), (int)(m_wolf->pos().y())));
+	TextOut(hdc, cx, height() - 2* cy, buf, wsprintf(buf, TEXT("Position of the sheep is (%d, %d)"), (int)(m_sheep->pos().x()), (int)(m_sheep->pos().y())));
+
+
 	BitBlt(hdc, (int)(m_target.x()-57/2), (int)(m_target.y()-57/2), 57, 57, m_hdcmem, 0, 0, SRCCOPY);
 
-	m_vehicle->render(hdc);
+	m_sheep->render(hdc);
+	HPEN red_pen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
+	HPEN old_pen = (HPEN)SelectObject(hdc, red_pen);
+	m_wolf->render(hdc);
+	SelectObject(hdc, old_pen);
+	DeleteObject(red_pen);
 }

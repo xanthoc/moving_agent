@@ -5,7 +5,8 @@
 
 class GameWorld
 {
-	Vehicle *m_vehicle;
+	Vehicle *m_sheep;
+	Vehicle *m_wolf;
 	int m_width;
 	int m_height;
 	Vector2D m_target;
@@ -22,6 +23,9 @@ public:
 	void set_target(int x, int y) { m_target = Vector2D(x, y); }
 	void update(double time_elapsed);
 	void render(HDC hdc);
+
+	Vehicle* sheep() { return m_sheep; }
+	Vehicle* wolf() { return m_wolf; }
 
 };
 
