@@ -69,5 +69,10 @@ public:
 		m_y += other.m_y;
 		return *this;
 	}
+	Vector2D& operator*=(double val) {
+		m_x *= val;
+		m_y *= val;
+		return *this;
+	}
 };
 

@@ -7,7 +7,7 @@ GameWorld::GameWorld() {
 	m_sheep->set_seek(true);
 	m_sheep->set_flee(true);
 	m_wolf = new Vehicle(this);
-	m_wolf->set_seek(true);
+	m_wolf->set_arrive(true);
 	m_wolf->pos() = Vector2D(100, 100);
 	m_crosshair = (HBITMAP)LoadImage(nullptr, TEXT("..\\crosshair.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	m_hdcmem = CreateCompatibleDC(nullptr);
