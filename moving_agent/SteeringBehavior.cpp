@@ -5,7 +5,7 @@
 
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
-m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false)
+m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false)
 {
 }
 
@@ -19,6 +19,10 @@ Vector2D SteeringBehavior::calculate() {
 	Vector2D force;
 	if (m_flee_flag) {
 		Vector2D tmp = flee(m_vehicle->world()->wolf()->pos());
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_pursuit_flag) {
+		Vector2D tmp = pursuit(m_vehicle->world()->sheep());
 		if (!accumulate_force(force, tmp)) return force;
 	}
 	if (m_seek_flag) {
@@ -55,7 +59,7 @@ Vector2D SteeringBehavior::seek(const Vector2D &target_pos) {
 
 Vector2D SteeringBehavior::flee(const Vector2D &target_pos) {
 	Vector2D distance = m_vehicle->pos() - target_pos;
-	if (distance.length_sq() > 100.0*100.0) {
+	if (distance.length_sq() > m_vehicle->world()->panic_dist()*m_vehicle->world()->panic_dist()) {
 		return Vector2D(0.0, 0.0);
 	}
 	distance = distance.get_normalized();
@@ -74,4 +78,10 @@ Vector2D SteeringBehavior::arrive(const Vector2D &target_pos, const Deceleration
 		return res - m_vehicle->velocity();
 	}
 	return Vector2D(0.0, 0.0);
+}
+
+Vector2D SteeringBehavior::pursuit(Vehicle *evader) {
+	Vector2D to_evader = evader->pos() - m_vehicle->pos();
+	double look_ahead_time = to_evader.length() / (m_vehicle->max_speed() + evader->velocity().length());
+	return seek(evader->pos() + evader->velocity()*look_ahead_time);
 }

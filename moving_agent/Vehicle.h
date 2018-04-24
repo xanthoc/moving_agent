@@ -18,5 +18,6 @@ public:
 	void set_seek(bool val) { m_steering->set_seek(val); }
 	void set_flee(bool val) { m_steering->set_flee(val); }
 	void set_arrive(bool val) { m_steering->set_arrive(val); }
+	void set_pursuit(bool val) { m_steering->set_pursuit(val); }
 };
 

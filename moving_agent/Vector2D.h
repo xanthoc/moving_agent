@@ -64,6 +64,12 @@ public:
 		res.m_y = m_y - other.m_y;
 		return res;
 	}
+	Vector2D operator+(const Vector2D &other) const {
+		Vector2D res;
+		res.m_x = m_x + other.m_x;
+		res.m_y = m_y + other.m_y;
+		return res;
+	}
 	Vector2D& operator+=(const Vector2D &other) {
 		m_x += other.m_x;
 		m_y += other.m_y;

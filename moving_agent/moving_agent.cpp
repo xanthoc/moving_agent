@@ -202,6 +202,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						my_config.set_time_delta(my_config.time_delta() * 2);
 					}
 					break;
+				case VK_UP:
+					gWorld.set_panic_dist(gWorld.panic_dist()*2.0);
+					break;
+				case VK_DOWN:
+					gWorld.set_panic_dist(gWorld.panic_dist()/2.0);
+					break;
 			}
 		}
 		break;
