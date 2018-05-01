@@ -2,10 +2,12 @@
 #include "SteeringBehavior.h"
 #include "Vehicle.h"
 #include "GameWorld.h"
+#include "MyRand.h"
 
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
-m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false)
+m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
+m_wander_radius(12.0), m_wander_dist(20.0), m_wander_jitter(400.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
 {
 }
 
@@ -31,6 +33,10 @@ Vector2D SteeringBehavior::calculate() {
 	}
 	if (m_arrive_flag) {
 		Vector2D tmp = arrive(m_vehicle->world()->target(), SLOW);
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_wander_flag) {
+		Vector2D tmp = wander();
 		if (!accumulate_force(force, tmp)) return force;
 	}
 	return force;
@@ -84,4 +90,21 @@ Vector2D SteeringBehavior::pursuit(Vehicle *evader) {
 	Vector2D to_evader = evader->pos() - m_vehicle->pos();
 	double look_ahead_time = to_evader.length() / (m_vehicle->max_speed() + evader->velocity().length());
 	return seek(evader->pos() + evader->velocity()*look_ahead_time);
+}
+
+static Vector2D to_world_space(const Vector2D &target, const Vector2D &heading, const Vector2D &side, const Vector2D &pos) {
+
+	Vector2D res = Vector2D(heading.x()*target.x() + side.x()*target.y(), heading.y()*target.x() + side.y()*target.y());
+	res += pos;
+	return res;
+}
+
+Vector2D SteeringBehavior::wander() {
+	m_wander_target += Vector2D(m_wander_jitter*my_rand.drand(), m_wander_jitter*my_rand.drand());
+	m_wander_target = m_wander_target.get_normalized();
+	m_wander_target *= m_wander_radius;
+	Vector2D tmp = m_wander_target + Vector2D(m_wander_dist, 0);
+	Vector2D target_pos = to_world_space(tmp, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
+	Vector2D to_target = target_pos - m_vehicle->pos();
+	return to_target-m_vehicle->velocity();
 }
