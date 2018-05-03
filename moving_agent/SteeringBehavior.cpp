@@ -7,7 +7,7 @@
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
 m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
-m_wander_radius(12.0), m_wander_dist(20.0), m_wander_jitter(400.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
+m_wander_radius(50.0), m_wander_dist(60.0), m_wander_jitter(40.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
 {
 }
 
@@ -100,11 +100,27 @@ static Vector2D to_world_space(const Vector2D &target, const Vector2D &heading, 
 }
 
 Vector2D SteeringBehavior::wander() {
-	m_wander_target += Vector2D(m_wander_jitter*my_rand.drand(), m_wander_jitter*my_rand.drand());
+	m_wander_target += Vector2D(m_wander_jitter*(my_rand.drand()-0.5)*2.0, m_wander_jitter*(my_rand.drand()-0.5)*2.0);
 	m_wander_target = m_wander_target.get_normalized();
 	m_wander_target *= m_wander_radius;
+	//m_wander_target = Vector2D(0.0, -m_wander_radius);
 	Vector2D tmp = m_wander_target + Vector2D(m_wander_dist, 0);
 	Vector2D target_pos = to_world_space(tmp, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
 	Vector2D to_target = target_pos - m_vehicle->pos();
-	return to_target-m_vehicle->velocity();
+	return to_target;// -m_vehicle->velocity();
+}
+
+void SteeringBehavior::render_wander_status(HDC hdc) {
+	if (!m_wander_flag) return;
+	HBRUSH old_brush = (HBRUSH)SelectObject(hdc, GetStockObject(NULL_BRUSH));
+	Vector2D circle_origin = Vector2D(m_wander_dist, 0);
+	Vector2D circle_origin_world = to_world_space(circle_origin, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
+	Ellipse(hdc, static_cast<int>(circle_origin_world.x() - m_wander_radius), static_cast<int>(circle_origin_world.y()-m_wander_radius), 
+		static_cast<int>(circle_origin_world.x() + m_wander_radius), static_cast<int>(circle_origin_world.y() + m_wander_radius));
+	Vector2D tmp = m_wander_target + Vector2D(m_wander_dist, 0);
+	Vector2D target_pos = to_world_space(tmp, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
+	int small_radius = 4;
+	Ellipse(hdc, static_cast<int>(target_pos.x() - small_radius), static_cast<int>(target_pos.y() - small_radius),
+		static_cast<int>(target_pos.x() + small_radius), static_cast<int>(target_pos.y() + small_radius));
+	SelectObject(hdc, old_brush);
 }

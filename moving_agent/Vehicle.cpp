@@ -63,4 +63,5 @@ void Vehicle::render(HDC hdc) {
 	}
 	LineTo(hdc, (int)pts[0].x(), (int)pts[0].y());
 
+	m_steering->render_wander_status(hdc);
 }

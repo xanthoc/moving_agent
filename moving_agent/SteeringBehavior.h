@@ -28,6 +28,7 @@ public:
 	Vector2D arrive(const Vector2D &target_pos, const Deceleration decel);
 	Vector2D pursuit(Vehicle *evader);
 	Vector2D wander();
+	void render_wander_status(HDC hdc);
 	void set_seek(bool val) { m_seek_flag = val; }
 	void set_flee(bool val) { m_flee_flag = val; }
 	void set_arrive(bool val) { m_arrive_flag = val; }
