@@ -8,7 +8,7 @@
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
 m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
-m_wander_radius(50.0), m_wander_dist(60.0), m_wander_jitter(40.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
+m_wander_radius(40.0), m_wander_dist(50.0), m_wander_jitter(20.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
 {
 }
 
@@ -21,12 +21,12 @@ SteeringBehavior::~SteeringBehavior()
 Vector2D SteeringBehavior::calculate() {
 	Vector2D force;
 	if (m_flee_flag) {
-		Vector2D tmp = flee(m_vehicle->world()->wolf()->pos());
-		if (!accumulate_force(force, tmp)) return force;
+//		Vector2D tmp = flee(m_vehicle->world()->wolf()->pos());
+//		if (!accumulate_force(force, tmp)) return force;
 	}
 	if (m_pursuit_flag) {
-		Vector2D tmp = pursuit(m_vehicle->world()->sheep());
-		if (!accumulate_force(force, tmp)) return force;
+//		Vector2D tmp = pursuit(m_vehicle->world()->sheep());
+//		if (!accumulate_force(force, tmp)) return force;
 	}
 	if (m_seek_flag) {
 		Vector2D tmp = seek(m_vehicle->world()->target());

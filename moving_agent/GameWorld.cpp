@@ -6,15 +6,6 @@
 #include "EntityFunctionTemplates.h"
 
 GameWorld::GameWorld() {
-	m_sheep = new Vehicle(this);
-	//m_sheep->set_seek(true);
-	//m_sheep->set_flee(true);
-	m_sheep->set_wander(true);
-	m_sheep->set_pos(Vector2D(100.0, 100.0));
-	m_wolf = new Vehicle(this);
-	//m_wolf->set_pursuit(true);
-	m_wolf->set_wander(true);
-	m_wolf->set_pos(Vector2D(500.0, 500.0));
 	m_crosshair = (HBITMAP)LoadImage(nullptr, TEXT("..\\crosshair.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	m_hdcmem = CreateCompatibleDC(nullptr);
 	m_old_crosshair = (HBITMAP)SelectObject(m_hdcmem, m_crosshair);
@@ -29,8 +20,9 @@ GameWorld::~GameWorld()
 	SelectObject(m_hdcmem, m_old_crosshair);
 	DeleteObject(m_crosshair);
 	DeleteDC(m_hdcmem);
-	delete m_wolf;
-	delete m_sheep;
+	for (auto iter = m_agents.begin(); iter != m_agents.end(); ++iter) {
+		delete *iter;
+	}
 	for (auto iter = m_obstacles.begin(); iter != m_obstacles.end(); ++iter) {
 		delete *iter;
 	}
@@ -38,8 +30,9 @@ GameWorld::~GameWorld()
 
 
 void GameWorld::update(double time_elapsed) {
-	m_sheep->update(time_elapsed);
-	m_wolf->update(time_elapsed);
+	for (auto iter = m_agents.begin(); iter != m_agents.end(); ++iter) {
+		(*iter)->update(time_elapsed);
+	}
 }
 
 void GameWorld::render() {
@@ -72,14 +65,11 @@ void GameWorld::render() {
 	long tmp = my_clock.total_msec();
 	text_len = wsprintf(buf, TEXT("Time elapsed = %d.%d s"), tmp / 1000, tmp % 1000);
 	my_gdi.draw_text_auto_pos(buf, text_len);
-	text_len = wsprintf(buf, TEXT("Position of the wolf is (%d, %d)"), (int)(m_wolf->pos().x()), (int)(m_wolf->pos().y()));
-	my_gdi.draw_text_auto_pos(buf, text_len);
-	text_len = wsprintf(buf, TEXT("Position of the sheep is (%d, %d)"), (int)(m_sheep->pos().x()), (int)(m_sheep->pos().y()));
-	my_gdi.draw_text_auto_pos(buf, text_len);
 
 	my_gdi.draw_image(m_target, 57.0, 57.0, m_hdcmem);
-	m_sheep->render();
-	m_wolf->render();
+
+	for (auto iter = m_agents.begin(); iter != m_agents.end(); ++iter) (*iter)->render();
+
 }
 
 
@@ -100,5 +90,14 @@ void GameWorld::create_obstacle() {
 				break;
 			}
 		}
+	}
+}
+
+void GameWorld::create_agent() {
+	for (int i = 0; i < app_param.num_agents(); ++i) {
+		Vehicle *ob = new Vehicle(this);
+		ob->set_wander(true);
+		ob->set_pos(Vector2D(my_rand.drand(0.0, m_width), my_rand.drand(0, m_height)));
+		m_agents.push_back(ob);
 	}
 }

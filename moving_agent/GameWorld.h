@@ -7,8 +7,6 @@
 
 class GameWorld
 {
-	Vehicle *m_sheep;
-	Vehicle *m_wolf;
 	int m_width;
 	int m_height;
 	double m_panic_dist;
@@ -17,8 +15,10 @@ class GameWorld
 	HDC m_hdcmem;
 
 	std::vector<Obstacle*> m_obstacles;
+	std::vector<Vehicle*> m_agents;
 
 	void create_obstacle();
+	void create_agent();
 
 public:
 	GameWorld();
@@ -35,10 +35,8 @@ public:
 	void render();
 	void create_detail() {
 		if (m_obstacles.empty()) create_obstacle();
+		if (m_agents.empty()) create_agent();
 	}
-
-	Vehicle* sheep() { return m_sheep; }
-	Vehicle* wolf() { return m_wolf; }
 
 };
 

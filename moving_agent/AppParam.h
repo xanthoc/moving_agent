@@ -1,6 +1,7 @@
 #pragma once
 class AppParam
 {
+	int m_num_agents;
 	int m_num_obstacles;
 	double m_min_obstacle_radius;
 	double m_max_obstacle_radius;
@@ -24,6 +25,7 @@ class AppParam
 	~AppParam();
 
 public:
+	int num_agents() const { return m_num_agents; }
 	int num_obstacles() const { return m_num_obstacles; }
 	double min_obstacle_radius() const { return m_min_obstacle_radius; }
 	double max_obstacle_radius() const { return m_max_obstacle_radius; }
