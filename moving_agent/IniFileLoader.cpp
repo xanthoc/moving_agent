@@ -26,11 +26,18 @@ std::string IniFileLoader::get_next_parameter() {
 		remove_comment(res);
 		if (res.length() == 0) continue;
 		size_t idx = res.find(" ");
-		if (idx == std::string::npos || idx==0) throw std::runtime_error("bad file");
+		if (idx == std::string::npos || idx == 0) {
+			MessageBox(nullptr, TEXT("bad file"), nullptr, MB_OK);
+			throw std::runtime_error("bad file");
+		}
 		idx = res.find_first_not_of(" ", idx);
-		if (idx == std::string::npos) throw std::runtime_error("bad file");
+		if (idx == std::string::npos) {
+			MessageBox(nullptr, TEXT("bad file"), nullptr, MB_OK);
+			throw std::runtime_error("bad file");
+		}
 		return res.substr(idx);
 	}
+	MessageBox(nullptr, TEXT("file read error"), nullptr, MB_OK);
 	throw std::runtime_error("file read error");
 }
 
