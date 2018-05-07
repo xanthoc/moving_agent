@@ -2,6 +2,8 @@
 #include "MyConfig.h"
 #include "MyClock.h"
 #include "Vehicle.h"
+#include "Obstacle.h"
+#include <vector>
 
 class GameWorld
 {
@@ -13,6 +15,9 @@ class GameWorld
 	Vector2D m_target;
 	HBITMAP m_crosshair, m_old_crosshair;
 	HDC m_hdcmem;
+
+	std::vector<Obstacle*> m_Obstacles;
+
 public:
 	GameWorld();
 	~GameWorld();

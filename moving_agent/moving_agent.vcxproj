@@ -145,13 +145,16 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppParam.h" />
     <ClInclude Include="BaseGameEntity.h" />
     <ClInclude Include="GameWorld.h" />
+    <ClInclude Include="IniFileLoader.h" />
     <ClInclude Include="MovingEntity.h" />
     <ClInclude Include="moving_agent.h" />
     <ClInclude Include="MyClock.h" />
     <ClInclude Include="MyConfig.h" />
     <ClInclude Include="MyRand.h" />
+    <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SteeringBehavior.h" />
@@ -160,13 +163,16 @@
     <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AppParam.cpp" />
     <ClCompile Include="BaseGameEntity.cpp" />
     <ClCompile Include="GameWorld.cpp" />
+    <ClCompile Include="IniFileLoader.cpp" />
     <ClCompile Include="MovingEntity.cpp" />
     <ClCompile Include="moving_agent.cpp" />
     <ClCompile Include="MyClock.cpp" />
     <ClCompile Include="MyConfig.cpp" />
     <ClCompile Include="MyRand.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

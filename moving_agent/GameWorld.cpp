@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GameWorld.h"
+#include "AppParam.h"
 
 
 GameWorld::GameWorld() {
@@ -7,15 +8,24 @@ GameWorld::GameWorld() {
 	//m_sheep->set_seek(true);
 	//m_sheep->set_flee(true);
 	m_sheep->set_wander(true);
+	m_sheep->set_pos(Vector2D(100.0, 100.0));
 	m_wolf = new Vehicle(this);
 	//m_wolf->set_pursuit(true);
 	m_wolf->set_wander(true);
-	m_wolf->pos() = Vector2D(100, 100);
+	m_wolf->set_pos(Vector2D(500.0, 500.0));
 	m_crosshair = (HBITMAP)LoadImage(nullptr, TEXT("..\\crosshair.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	m_hdcmem = CreateCompatibleDC(nullptr);
 	m_old_crosshair = (HBITMAP)SelectObject(m_hdcmem, m_crosshair);
 	m_target = Vector2D(100, 200);
 	m_panic_dist = 100.0;
+
+	double x_of_ob = 50.0;
+	double r_of_ob = 20;
+	for (int i = 0; i < app_param.num_obstacles(); ++i) {
+		m_Obstacles.push_back(new Obstacle(Vector2D(x_of_ob, 1.01*x_of_ob), r_of_ob));
+		x_of_ob += 2.0 * r_of_ob;
+		r_of_ob += 10.0;
+	}
 }
 
 
@@ -26,6 +36,9 @@ GameWorld::~GameWorld()
 	DeleteDC(m_hdcmem);
 	delete m_wolf;
 	delete m_sheep;
+	for (auto iter = m_Obstacles.begin(); iter != m_Obstacles.end(); ++iter) {
+		delete *iter;
+	}
 }
 
 
@@ -70,4 +83,8 @@ void GameWorld::render(HDC hdc) {
 	m_wolf->render(hdc);
 	SelectObject(hdc, old_pen);
 	DeleteObject(red_pen);
+
+	HBRUSH old_brush = (HBRUSH)SelectObject(hdc, GetStockObject(GRAY_BRUSH));
+	for (auto iter = m_Obstacles.begin(); iter != m_Obstacles.end(); ++iter) (*iter)->render(hdc);
+	SelectObject(hdc, old_brush);
 }
