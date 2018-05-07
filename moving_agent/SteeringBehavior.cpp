@@ -3,6 +3,7 @@
 #include "Vehicle.h"
 #include "GameWorld.h"
 #include "MyRand.h"
+#include "MyGDI.h"
 
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
@@ -110,17 +111,13 @@ Vector2D SteeringBehavior::wander() {
 	return to_target;// -m_vehicle->velocity();
 }
 
-void SteeringBehavior::render_wander_status(HDC hdc) {
+void SteeringBehavior::render_wander_status() {
 	if (!m_wander_flag) return;
-	HBRUSH old_brush = (HBRUSH)SelectObject(hdc, GetStockObject(NULL_BRUSH));
 	Vector2D circle_origin = Vector2D(m_wander_dist, 0);
 	Vector2D circle_origin_world = to_world_space(circle_origin, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
-	Ellipse(hdc, static_cast<int>(circle_origin_world.x() - m_wander_radius), static_cast<int>(circle_origin_world.y()-m_wander_radius), 
-		static_cast<int>(circle_origin_world.x() + m_wander_radius), static_cast<int>(circle_origin_world.y() + m_wander_radius));
+	my_gdi.draw_empty_circle(circle_origin_world, m_wander_radius);
 	Vector2D tmp = m_wander_target + Vector2D(m_wander_dist, 0);
 	Vector2D target_pos = to_world_space(tmp, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
 	int small_radius = 4;
-	Ellipse(hdc, static_cast<int>(target_pos.x() - small_radius), static_cast<int>(target_pos.y() - small_radius),
-		static_cast<int>(target_pos.x() + small_radius), static_cast<int>(target_pos.y() + small_radius));
-	SelectObject(hdc, old_brush);
+	my_gdi.draw_empty_circle(target_pos, small_radius);
 }

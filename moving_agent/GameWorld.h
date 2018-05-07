@@ -30,7 +30,7 @@ public:
 	Vector2D target() { return m_target; }
 	void set_target(int x, int y) { m_target = Vector2D(x, y); }
 	void update(double time_elapsed);
-	void render(HDC hdc);
+	void render();
 
 	Vehicle* sheep() { return m_sheep; }
 	Vehicle* wolf() { return m_wolf; }

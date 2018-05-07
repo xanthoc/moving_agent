@@ -3,6 +3,7 @@
 #include "GameWorld.h"
 #include <vector>
 #include "Vector2D.h"
+#include "MyGDI.h"
 
 Vehicle::Vehicle(GameWorld *world) : m_world(world), m_steering(new SteeringBehavior(this))
 {
@@ -30,7 +31,7 @@ void Vehicle::update(double time_elapsed) {
 }
 
 
-void Vehicle::render(HDC hdc) {
+void Vehicle::render() {
 	//Ellipse(hdc, m_pos.x() - 5, m_pos.y() - 5, m_pos.x() + 5, m_pos.y() + 5);
 
 	std::vector<Vector2D> pts;
@@ -57,11 +58,7 @@ void Vehicle::render(HDC hdc) {
 		pts[i] += m_pos;
 	}
 
-	MoveToEx(hdc, (int)pts[0].x(), (int)pts[0].y(), nullptr);
-	for (unsigned int p = 1; p<pts.size(); ++p) {
-		LineTo(hdc, (int)pts[p].x(), (int)pts[p].y());
-	}
-	LineTo(hdc, (int)pts[0].x(), (int)pts[0].y());
+	my_gdi.draw_triangle(pts);
 
-	m_steering->render_wander_status(hdc);
+	m_steering->render_wander_status();
 }

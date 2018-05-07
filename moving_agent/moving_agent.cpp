@@ -6,6 +6,7 @@
 #include "GameWorld.h"
 #include "MyClock.h"
 #include "MyConfig.h"
+#include "MyGDI.h"
 
 #define MAX_LOADSTRING 100
 
@@ -172,6 +173,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			GetClientRect(hWnd, &rect);
 			HBITMAP hbitmap = CreateCompatibleBitmap(hdc, rect.right, rect.bottom);
 			old_bitmap = (HBITMAP)SelectObject(hdcmem, hbitmap);
+			my_gdi.set_dc(hdcmem);
 			ReleaseDC(hWnd, hdc);
 		}
 		break;
@@ -217,7 +219,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
 			BitBlt(hdcmem, 0, 0, gWorld.width(), gWorld.height(), NULL, NULL, NULL, WHITENESS);
-			gWorld.render(hdcmem);
+			gWorld.render();
 			BitBlt(hdc, 0, 0, gWorld.width(), gWorld.height(), hdcmem, 0, 0, SRCCOPY);
 			EndPaint(hWnd, &ps);
         }

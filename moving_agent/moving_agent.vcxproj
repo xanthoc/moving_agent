@@ -153,6 +153,7 @@
     <ClInclude Include="moving_agent.h" />
     <ClInclude Include="MyClock.h" />
     <ClInclude Include="MyConfig.h" />
+    <ClInclude Include="MyGDI.h" />
     <ClInclude Include="MyRand.h" />
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Resource.h" />
@@ -171,6 +172,7 @@
     <ClCompile Include="moving_agent.cpp" />
     <ClCompile Include="MyClock.cpp" />
     <ClCompile Include="MyConfig.cpp" />
+    <ClCompile Include="MyGDI.cpp" />
     <ClCompile Include="MyRand.cpp" />
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="stdafx.cpp">

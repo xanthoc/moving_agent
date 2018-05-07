@@ -14,7 +14,7 @@ public:
 	Vehicle(GameWorld *world);
 	virtual ~Vehicle();
 	void update(double time_elapsed);
-	void render(HDC hdc);
+	void render();
 	void set_seek(bool val) { m_steering->set_seek(val); }
 	void set_flee(bool val) { m_steering->set_flee(val); }
 	void set_arrive(bool val) { m_steering->set_arrive(val); }
