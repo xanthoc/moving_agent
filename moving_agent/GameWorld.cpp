@@ -2,6 +2,8 @@
 #include "GameWorld.h"
 #include "AppParam.h"
 #include "MyGDI.h"
+#include "MyRand.h"
+#include "EntityFunctionTemplates.h"
 
 GameWorld::GameWorld() {
 	m_sheep = new Vehicle(this);
@@ -19,13 +21,6 @@ GameWorld::GameWorld() {
 	m_target = Vector2D(800, 200);
 	m_panic_dist = 100.0;
 
-	double x_of_ob = 50.0;
-	double r_of_ob = 20;
-	for (int i = 0; i < app_param.num_obstacles(); ++i) {
-		m_Obstacles.push_back(new Obstacle(Vector2D(x_of_ob, 1.01*x_of_ob), r_of_ob));
-		x_of_ob += 2.0 * r_of_ob;
-		r_of_ob += 10.0;
-	}
 }
 
 
@@ -36,7 +31,7 @@ GameWorld::~GameWorld()
 	DeleteDC(m_hdcmem);
 	delete m_wolf;
 	delete m_sheep;
-	for (auto iter = m_Obstacles.begin(); iter != m_Obstacles.end(); ++iter) {
+	for (auto iter = m_obstacles.begin(); iter != m_obstacles.end(); ++iter) {
 		delete *iter;
 	}
 }
@@ -63,7 +58,7 @@ void GameWorld::render() {
 	*/
 	my_gdi.draw_axes(m_width, m_height);
 
-	for (auto iter = m_Obstacles.begin(); iter != m_Obstacles.end(); ++iter) (*iter)->render();
+	for (auto iter = m_obstacles.begin(); iter != m_obstacles.end(); ++iter) (*iter)->render();
 
 	my_gdi.reset_text_auto_pos();
 	TCHAR buf[512];
@@ -85,4 +80,25 @@ void GameWorld::render() {
 	my_gdi.draw_image(m_target, 57.0, 57.0, m_hdcmem);
 	m_sheep->render();
 	m_wolf->render();
+}
+
+
+void GameWorld::create_obstacle() {
+	for (int i = 0; i < app_param.num_obstacles(); ++i) {
+		int num_try = 10;
+		while (num_try) {
+			double radius = my_rand.drand(app_param.min_obstacle_radius(), app_param.max_obstacle_radius());
+			double x = my_rand.drand(radius, m_width - radius);
+			double y = my_rand.drand(radius, m_height - radius);
+			Obstacle *ob = new Obstacle(Vector2D(x, y), radius);
+			if (is_overlapped(ob, m_obstacles, app_param.min_dist_btn_obstacle())) {
+				delete ob;
+				--num_try;
+			}
+			else {
+				m_obstacles.push_back(ob);
+				break;
+			}
+		}
+	}
 }

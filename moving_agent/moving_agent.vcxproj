@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="AppParam.h" />
     <ClInclude Include="BaseGameEntity.h" />
+    <ClInclude Include="EntityFunctionTemplates.h" />
     <ClInclude Include="GameWorld.h" />
     <ClInclude Include="IniFileLoader.h" />
     <ClInclude Include="MovingEntity.h" />

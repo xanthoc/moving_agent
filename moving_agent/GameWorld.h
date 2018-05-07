@@ -16,7 +16,9 @@ class GameWorld
 	HBITMAP m_crosshair, m_old_crosshair;
 	HDC m_hdcmem;
 
-	std::vector<Obstacle*> m_Obstacles;
+	std::vector<Obstacle*> m_obstacles;
+
+	void create_obstacle();
 
 public:
 	GameWorld();
@@ -31,6 +33,9 @@ public:
 	void set_target(int x, int y) { m_target = Vector2D(x, y); }
 	void update(double time_elapsed);
 	void render();
+	void create_detail() {
+		if (m_obstacles.empty()) create_obstacle();
+	}
 
 	Vehicle* sheep() { return m_sheep; }
 	Vehicle* wolf() { return m_wolf; }

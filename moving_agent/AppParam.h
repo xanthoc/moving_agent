@@ -2,8 +2,9 @@
 class AppParam
 {
 	int m_num_obstacles;
-	int m_min_obstacle_radius;
-	int m_max_obstacle_radius;
+	double m_min_obstacle_radius;
+	double m_max_obstacle_radius;
+	double m_min_dist_btn_obstacle;
 	//this is used to multiply the steering force AND all the multipliers
 	//found in SteeringBehavior
 	double m_steering_force_tweaker;
@@ -24,8 +25,9 @@ class AppParam
 
 public:
 	int num_obstacles() const { return m_num_obstacles; }
-	int min_obstacle_radius() const { return m_min_obstacle_radius; }
-	int max_obstacle_radius() const { return m_max_obstacle_radius; }
+	double min_obstacle_radius() const { return m_min_obstacle_radius; }
+	double max_obstacle_radius() const { return m_max_obstacle_radius; }
+	double min_dist_btn_obstacle() const { return m_min_dist_btn_obstacle; }
 	double steering_force_tweaker() const { return m_steering_force_tweaker; }
 	double steering_force() const { return m_steering_force; }
 	double max_speed() const { return m_max_speed; }

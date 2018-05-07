@@ -188,6 +188,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			gWorld.set_width(LOWORD(lParam));
 			gWorld.set_height(HIWORD(lParam));
+			gWorld.create_detail();
 		}
 		break;
 	case WM_KEYDOWN:
