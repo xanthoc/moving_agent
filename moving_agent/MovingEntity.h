@@ -14,6 +14,7 @@ protected:
 
 public:
 	MovingEntity();
+	MovingEntity(const Vector2D &pos, double br);
 	virtual ~MovingEntity();
 	Vector2D& velocity() { return m_velocity; }
 	Vector2D& heading() { return m_heading; }

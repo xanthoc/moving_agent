@@ -8,6 +8,7 @@
 Vehicle::Vehicle(GameWorld *world) : m_world(world), m_steering(new SteeringBehavior(this))
 {
 	m_scale = Vector2D(10.0, 10.0);
+	m_bounding_radius = 6;
 }
 
 
@@ -58,7 +59,8 @@ void Vehicle::render() {
 		pts[i] += m_pos;
 	}
 
-	my_gdi.draw_triangle(pts);
+	my_gdi.draw_closed_shape(pts);
 
 	m_steering->render_wander_status();
+	m_steering->render_detection_box();
 }

@@ -37,6 +37,7 @@ public:
 		if (m_obstacles.empty()) create_obstacle();
 		if (m_agents.empty()) create_agent();
 	}
+	std::vector<Obstacle*> &obstacles() { return m_obstacles; }
 
 };
 

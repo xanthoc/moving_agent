@@ -30,11 +30,17 @@ void MyGDI::draw_gray_circle(const Vector2D &c, double r) {
 	SelectObject(m_hdc, old_brush);
 }
 
+void MyGDI::draw_light_gray_circle(const Vector2D &c, double r) {
+	HBRUSH old_brush = (HBRUSH)SelectObject(m_hdc, GetStockObject(LTGRAY_BRUSH));
+	Ellipse(m_hdc, static_cast<int>(c.x() - r), static_cast<int>(c.y() - r), static_cast<int>(c.x() + r), static_cast<int>(c.y() + r));
+	SelectObject(m_hdc, old_brush);
+}
+
 void MyGDI::draw_image(const Vector2D &c, double sx, double sy, HDC image) {
 	BitBlt(m_hdc, static_cast<int>(c.x() - sx / 2.0), static_cast<int>(c.y() - sy / 2.0), static_cast<int>(sx), static_cast<int>(sy), image, 0, 0, SRCCOPY);
 }
 
-void MyGDI::draw_triangle(const std::vector<Vector2D> &pts) {
+void MyGDI::draw_closed_shape(const std::vector<Vector2D> &pts) {
 	MoveToEx(m_hdc, (int)pts[0].x(), (int)pts[0].y(), nullptr);
 	for (unsigned int p = 1; p<pts.size(); ++p) {
 		LineTo(m_hdc, (int)pts[p].x(), (int)pts[p].y());

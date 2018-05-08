@@ -16,4 +16,14 @@ bool is_overlapped(const T *ob, const ConT &con_ob, double min_dist) {
 	return overlapped;
 }
 
+template <typename T, typename ConT>
+void tag_neighbor(const T *ob, const ConT &con_ob, double range) {
+	for (typename ConT::const_iterator iter = con_ob.begin(); iter != con_ob.end(); ++iter) {
+		(*iter)->untag();
+		Vector2D to = (*iter)->pos() - ob->pos();
+		double dist = to.length() - (*iter)->bounding_radius();
+		if (dist < range) (*iter)->tag();
+	}
+}
+
 

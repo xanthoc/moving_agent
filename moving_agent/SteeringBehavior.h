@@ -1,5 +1,7 @@
 #pragma once
 #include "Vector2D.h"
+#include <vector>
+#include "Obstacle.h"
 
 class Vehicle;
 
@@ -8,16 +10,20 @@ class SteeringBehavior
 	Vehicle *m_vehicle;
 	bool m_seek_flag;
 	bool m_flee_flag;
+
 	bool m_arrive_flag;
+	enum Deceleration { SLOW = 3, NORMAL = 2, FAST = 1 };
+
 	bool m_pursuit_flag;
+
 	bool m_wander_flag;
-	// member variables for wander behavior
 	double m_wander_radius;
 	double m_wander_dist;
 	double m_wander_jitter;
 	Vector2D m_wander_target;
-	// end of member variables for wander behavior
-	enum Deceleration { SLOW=3, NORMAL=2, FAST=1 };
+
+	bool m_obstacle_avoidance_flag;
+
 public:
 	SteeringBehavior(Vehicle *vehicle);
 	~SteeringBehavior();
@@ -28,11 +34,14 @@ public:
 	Vector2D arrive(const Vector2D &target_pos, const Deceleration decel);
 	Vector2D pursuit(Vehicle *evader);
 	Vector2D wander();
+	Vector2D obstacle_avoidance(const std::vector<Obstacle*> &obstacles);
 	void render_wander_status();
+	void render_detection_box();
 	void set_seek(bool val) { m_seek_flag = val; }
 	void set_flee(bool val) { m_flee_flag = val; }
 	void set_arrive(bool val) { m_arrive_flag = val; }
 	void set_pursuit(bool val) { m_pursuit_flag = val; }
 	void set_wander(bool val) { m_wander_flag = val; }
+	void set_obstacle_avoidance(bool val) { m_obstacle_avoidance_flag = val; }
 };
 

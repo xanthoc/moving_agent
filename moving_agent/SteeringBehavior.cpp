@@ -4,6 +4,8 @@
 #include "GameWorld.h"
 #include "MyRand.h"
 #include "MyGDI.h"
+#include "AppParam.h"
+#include "EntityFunctionTemplates.h"
 
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
@@ -34,6 +36,10 @@ Vector2D SteeringBehavior::calculate() {
 	}
 	if (m_arrive_flag) {
 		Vector2D tmp = arrive(m_vehicle->world()->target(), SLOW);
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_obstacle_avoidance_flag) {
+		Vector2D tmp = obstacle_avoidance(m_vehicle->world()->obstacles());
 		if (!accumulate_force(force, tmp)) return force;
 	}
 	if (m_wander_flag) {
@@ -120,4 +126,25 @@ void SteeringBehavior::render_wander_status() {
 	Vector2D target_pos = to_world_space(tmp, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
 	int small_radius = 4;
 	my_gdi.draw_empty_circle(target_pos, small_radius);
+}
+
+Vector2D SteeringBehavior::obstacle_avoidance(const std::vector<Obstacle*> &obstacles) {
+	Vector2D res;
+	double detection_box_len = app_param.min_detection_box_length()*(1.0 + m_vehicle->velocity().length() / m_vehicle->max_speed());
+	tag_neighbor(m_vehicle, obstacles, detection_box_len);
+	return res;
+}
+
+void SteeringBehavior::render_detection_box() {
+	if (!m_obstacle_avoidance_flag) return;
+	double detection_box_len = app_param.min_detection_box_length()*(1.0 + m_vehicle->velocity().length() / m_vehicle->max_speed());
+	std::vector<Vector2D> pts;
+	pts.push_back(Vector2D(0, m_vehicle->bounding_radius()));
+	pts.push_back(Vector2D(0, -m_vehicle->bounding_radius()));
+	pts.push_back(Vector2D(detection_box_len, -m_vehicle->bounding_radius()));
+	pts.push_back(Vector2D(detection_box_len, m_vehicle->bounding_radius()));
+	for (unsigned i = 0; i < pts.size(); ++i) {
+		pts[i] = to_world_space(pts[i], m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
+	}
+	my_gdi.draw_closed_shape(pts);
 }

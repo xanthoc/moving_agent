@@ -96,6 +96,7 @@ void GameWorld::create_obstacle() {
 void GameWorld::create_agent() {
 	for (int i = 0; i < app_param.num_agents(); ++i) {
 		Vehicle *ob = new Vehicle(this);
+		ob->set_obstacle_avoidance(true);
 		ob->set_wander(true);
 		ob->set_pos(Vector2D(my_rand.drand(0.0, m_width), my_rand.drand(0, m_height)));
 		m_agents.push_back(ob);
