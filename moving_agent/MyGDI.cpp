@@ -24,6 +24,16 @@ void MyGDI::draw_axes(int width, int height) {
 	LineTo(m_hdc, width, height / 2);
 }
 
+void MyGDI::draw_circle(const Vector2D &c, double r) {
+	Ellipse(m_hdc, static_cast<int>(c.x() - r), static_cast<int>(c.y() - r), static_cast<int>(c.x() + r), static_cast<int>(c.y() + r));
+}
+
+void MyGDI::draw_dark_gray_circle(const Vector2D &c, double r) {
+	HBRUSH old_brush = (HBRUSH)SelectObject(m_hdc, GetStockObject(DKGRAY_BRUSH));
+	Ellipse(m_hdc, static_cast<int>(c.x() - r), static_cast<int>(c.y() - r), static_cast<int>(c.x() + r), static_cast<int>(c.y() + r));
+	SelectObject(m_hdc, old_brush);
+}
+
 void MyGDI::draw_gray_circle(const Vector2D &c, double r) {
 	HBRUSH old_brush = (HBRUSH)SelectObject(m_hdc, GetStockObject(GRAY_BRUSH));
 	Ellipse(m_hdc, static_cast<int>(c.x() - r), static_cast<int>(c.y() - r), static_cast<int>(c.x() + r), static_cast<int>(c.y() + r));

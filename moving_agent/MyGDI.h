@@ -14,6 +14,8 @@ public:
 	static MyGDI& instance();
 	void set_dc(HDC hdc) { m_hdc = hdc; }
 	void draw_axes(int width, int height);
+	void draw_circle(const Vector2D &c, double r);
+	void draw_dark_gray_circle(const Vector2D &c, double r);
 	void draw_gray_circle(const Vector2D &c, double r);
 	void draw_light_gray_circle(const Vector2D &c, double r);
 	void draw_image(const Vector2D &c, double sx, double sy, HDC image);

@@ -10,7 +10,7 @@
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
 m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
-m_wander_radius(40.0), m_wander_dist(50.0), m_wander_jitter(20.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
+m_wander_radius(20.0), m_wander_dist(50.0), m_wander_jitter(30.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
 {
 }
 
@@ -106,6 +106,12 @@ static Vector2D to_world_space(const Vector2D &target, const Vector2D &heading, 
 	return res;
 }
 
+static Vector2D to_local_space(const Vector2D &target, const Vector2D &heading, const Vector2D &side, const Vector2D &pos) {
+	Vector2D res = target - pos;
+	res = Vector2D(heading.x()*res.x() + heading.y()*res.y(), side.x()*res.x() + side.y()*res.y());
+	return res;
+}
+
 Vector2D SteeringBehavior::wander() {
 	m_wander_target += Vector2D(m_wander_jitter*(my_rand.drand()-0.5)*2.0, m_wander_jitter*(my_rand.drand()-0.5)*2.0);
 	m_wander_target = m_wander_target.get_normalized();
@@ -132,6 +138,37 @@ Vector2D SteeringBehavior::obstacle_avoidance(const std::vector<Obstacle*> &obst
 	Vector2D res;
 	double detection_box_len = app_param.min_detection_box_length()*(1.0 + m_vehicle->velocity().length() / m_vehicle->max_speed());
 	tag_neighbor(m_vehicle, obstacles, detection_box_len);
+	double inter_max = 10000000.0;
+	Obstacle* inter_ob = nullptr;
+	Vector2D inter_local;
+	for (std::vector<Obstacle*>::const_iterator iter = obstacles.begin(); iter != obstacles.end(); ++iter) {
+		if ((*iter)->is_tagged()) {
+			Vector2D pos_local = to_local_space((*iter)->pos(), m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
+			//Vector2D pos_world = to_world_space(pos_local, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
+			double expanded_radius = (*iter)->bounding_radius() + m_vehicle->bounding_radius();
+			if (pos_local.x() > 0.0 && fabs(pos_local.y()) < expanded_radius) {
+				(*iter)->set_scale(Vector2D(2.0, 2.0));
+				double sqrt_part = sqrt(expanded_radius*expanded_radius - pos_local.y()*pos_local.y());
+				double inter_dist = pos_local.x() - sqrt_part;
+				if (inter_dist < 0.0) inter_dist = pos_local.x() + sqrt_part;
+				if (inter_dist < inter_max) {
+					inter_max = inter_dist;
+					inter_ob = *iter;
+					inter_local = pos_local;
+				}
+			}
+		}
+	}
+	if (inter_ob) {
+		inter_ob->set_scale(Vector2D(3.0, 3.0));
+		double weight = 1.0 + (detection_box_len - inter_local.x()) / detection_box_len;
+		double fy = inter_ob->bounding_radius() + m_vehicle->bounding_radius() - fabs(inter_local.y());
+		fy = inter_local.y() > 0 ? -fy : fy;
+		fy *= 15.0*weight;
+		double fx = -0.5*(detection_box_len + inter_ob->bounding_radius() - inter_local.x());
+		res = Vector2D(fx, fy);
+		res = to_world_space(res, m_vehicle->heading(), m_vehicle->side(), Vector2D(0.0, 0.0));
+	}
 	return res;
 }
 
