@@ -21,5 +21,6 @@ public:
 	void set_pursuit(bool val) { m_steering->set_pursuit(val); }
 	void set_wander(bool val) { m_steering->set_wander(val); }
 	void set_obstacle_avoidance(bool val) { m_steering->set_obstacle_avoidance(val); }
+	void set_wall_avoidance(bool val) { m_steering->set_wall_avoidance(val); }
 };
 

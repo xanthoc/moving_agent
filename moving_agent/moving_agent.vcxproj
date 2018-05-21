@@ -149,6 +149,7 @@
     <ClInclude Include="BaseGameEntity.h" />
     <ClInclude Include="EntityFunctionTemplates.h" />
     <ClInclude Include="GameWorld.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="IniFileLoader.h" />
     <ClInclude Include="MovingEntity.h" />
     <ClInclude Include="moving_agent.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Vector2D.h" />
     <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="Wall.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppParam.cpp" />
@@ -185,6 +187,7 @@
     <ClCompile Include="SteeringBehavior.cpp" />
     <ClCompile Include="Vector2D.cpp" />
     <ClCompile Include="Vehicle.cpp" />
+    <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="moving_agent.rc" />

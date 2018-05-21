@@ -3,6 +3,7 @@
 #include "MyClock.h"
 #include "Vehicle.h"
 #include "Obstacle.h"
+#include "Wall.h"
 #include <vector>
 
 class GameWorld
@@ -15,8 +16,10 @@ class GameWorld
 	HDC m_hdcmem;
 
 	std::vector<Obstacle*> m_obstacles;
+	std::vector<Wall*> m_walls;
 	std::vector<Vehicle*> m_agents;
 
+	void create_wall();
 	void create_obstacle();
 	void create_agent();
 
@@ -34,10 +37,13 @@ public:
 	void update(double time_elapsed);
 	void render();
 	void create_detail() {
+		// create_detail is called when WM_SIZE is received, so check whether each container is empty
+		if (m_walls.empty()) create_wall();
 		if (m_obstacles.empty()) create_obstacle();
 		if (m_agents.empty()) create_agent();
 	}
 	std::vector<Obstacle*> &obstacles() { return m_obstacles; }
+	std::vector<Wall*> &walls() { return m_walls; }
 
 };
 

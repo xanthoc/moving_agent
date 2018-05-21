@@ -2,6 +2,7 @@
 #include "Vector2D.h"
 #include <vector>
 #include "Obstacle.h"
+#include "Wall.h"
 
 class Vehicle;
 
@@ -24,6 +25,8 @@ class SteeringBehavior
 
 	bool m_obstacle_avoidance_flag;
 
+	bool m_wall_avoidance_flag;
+
 public:
 	SteeringBehavior(Vehicle *vehicle);
 	~SteeringBehavior();
@@ -35,13 +38,16 @@ public:
 	Vector2D pursuit(Vehicle *evader);
 	Vector2D wander();
 	Vector2D obstacle_avoidance(const std::vector<Obstacle*> &obstacles);
+	Vector2D wall_avoidance(const std::vector<Wall*> &walls);
 	void render_wander_status();
 	void render_detection_box();
+	void render_feeler();
 	void set_seek(bool val) { m_seek_flag = val; }
 	void set_flee(bool val) { m_flee_flag = val; }
 	void set_arrive(bool val) { m_arrive_flag = val; }
 	void set_pursuit(bool val) { m_pursuit_flag = val; }
 	void set_wander(bool val) { m_wander_flag = val; }
 	void set_obstacle_avoidance(bool val) { m_obstacle_avoidance_flag = val; }
+	void set_wall_avoidance(bool val) { m_wall_avoidance_flag = val; }
 };
 

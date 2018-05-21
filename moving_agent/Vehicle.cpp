@@ -33,7 +33,7 @@ void Vehicle::update(double time_elapsed) {
 
 
 void Vehicle::render() {
-	//Ellipse(hdc, m_pos.x() - 5, m_pos.y() - 5, m_pos.x() + 5, m_pos.y() + 5);
+	//Ellipse(hdc, m_pos.m_x - 5, m_pos.m_y - 5, m_pos.m_x + 5, m_pos.m_y + 5);
 
 	std::vector<Vector2D> pts;
 	pts.push_back(Vector2D(-1.0, 0.6));
@@ -42,15 +42,15 @@ void Vehicle::render() {
 
 	// scale
 	for (unsigned int i = 0; i < pts.size(); ++i) {
-		double x = m_scale.x()*pts[i].x();
-		double y = m_scale.y()*pts[i].y();
+		double x = m_scale.m_x*pts[i].m_x;
+		double y = m_scale.m_y*pts[i].m_y;
 		pts[i] = Vector2D(x, y);
 	}
 
 	// rotate
 	for (unsigned int i = 0; i < pts.size(); ++i) {
-		double x = m_heading.x()*pts[i].x() + m_side.x()*pts[i].y();
-		double y = m_heading.y()*pts[i].x() + m_side.y()*pts[i].y();
+		double x = m_heading.m_x*pts[i].m_x + m_side.m_x*pts[i].m_y;
+		double y = m_heading.m_y*pts[i].m_x + m_side.m_y*pts[i].m_y;
 		pts[i] = Vector2D(x, y);
 	}
 
@@ -63,4 +63,5 @@ void Vehicle::render() {
 
 	m_steering->render_wander_status();
 	m_steering->render_detection_box();
+	m_steering->render_feeler();
 }

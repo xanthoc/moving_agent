@@ -26,6 +26,9 @@ GameWorld::~GameWorld()
 	for (auto iter = m_obstacles.begin(); iter != m_obstacles.end(); ++iter) {
 		delete *iter;
 	}
+	for (auto iter = m_walls.begin(); iter != m_walls.end(); ++iter) {
+		delete *iter;
+	}
 }
 
 
@@ -51,6 +54,8 @@ void GameWorld::render() {
 	*/
 	my_gdi.draw_axes(m_width, m_height);
 
+	for (auto iter = m_walls.begin(); iter != m_walls.end(); ++iter) (*iter)->render();
+
 	for (auto iter = m_obstacles.begin(); iter != m_obstacles.end(); ++iter) (*iter)->render();
 
 	my_gdi.reset_text_auto_pos();
@@ -70,6 +75,20 @@ void GameWorld::render() {
 
 	for (auto iter = m_agents.begin(); iter != m_agents.end(); ++iter) (*iter)->render();
 
+}
+
+
+void GameWorld::create_wall() {
+	double offset = 5.0;
+	Vector2D from, to;
+	from = Vector2D(offset, offset);
+	to = Vector2D(m_width - offset, offset);
+	Wall *ob = new Wall(from, to);
+	m_walls.push_back(ob);
+	to = Vector2D(offset, m_height - offset);
+	from = Vector2D(m_width - offset, m_height - offset);
+	ob = new Wall(from, to);
+	m_walls.push_back(ob);
 }
 
 
@@ -96,8 +115,10 @@ void GameWorld::create_obstacle() {
 void GameWorld::create_agent() {
 	for (int i = 0; i < app_param.num_agents(); ++i) {
 		Vehicle *ob = new Vehicle(this);
+		ob->set_wall_avoidance(true);
 		ob->set_obstacle_avoidance(true);
 		ob->set_wander(true);
+		//ob->set_arrive(true);
 		ob->set_pos(Vector2D(my_rand.drand(0.0, m_width), my_rand.drand(0, m_height)));
 		m_agents.push_back(ob);
 	}

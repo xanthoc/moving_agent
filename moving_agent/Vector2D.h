@@ -4,14 +4,12 @@
 
 class Vector2D
 {
+public:
 	double m_x;
 	double m_y;
-public:
-	Vector2D();
-	Vector2D(double x, double y);
-	~Vector2D();
-	double x() const { return m_x; }
-	double y() const { return m_y; }
+	Vector2D() : m_x(0.0), m_y(0.0) {}
+	Vector2D(double x, double y) : m_x(x), m_y(y) {}
+	~Vector2D() {}
 	double length() const {
 		return sqrt(m_x*m_x + m_y*m_y);
 	}

@@ -6,7 +6,7 @@
 #include "MyGDI.h"
 #include "AppParam.h"
 #include "EntityFunctionTemplates.h"
-
+#include "Geometry.h"
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
 m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
@@ -22,6 +22,14 @@ SteeringBehavior::~SteeringBehavior()
 
 Vector2D SteeringBehavior::calculate() {
 	Vector2D force;
+	if (m_wall_avoidance_flag) {
+		Vector2D tmp = wall_avoidance(m_vehicle->world()->walls());
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_obstacle_avoidance_flag) {
+		Vector2D tmp = obstacle_avoidance(m_vehicle->world()->obstacles());
+		if (!accumulate_force(force, tmp)) return force;
+	}
 	if (m_flee_flag) {
 //		Vector2D tmp = flee(m_vehicle->world()->wolf()->pos());
 //		if (!accumulate_force(force, tmp)) return force;
@@ -36,10 +44,6 @@ Vector2D SteeringBehavior::calculate() {
 	}
 	if (m_arrive_flag) {
 		Vector2D tmp = arrive(m_vehicle->world()->target(), SLOW);
-		if (!accumulate_force(force, tmp)) return force;
-	}
-	if (m_obstacle_avoidance_flag) {
-		Vector2D tmp = obstacle_avoidance(m_vehicle->world()->obstacles());
 		if (!accumulate_force(force, tmp)) return force;
 	}
 	if (m_wander_flag) {
@@ -99,19 +103,6 @@ Vector2D SteeringBehavior::pursuit(Vehicle *evader) {
 	return seek(evader->pos() + evader->velocity()*look_ahead_time);
 }
 
-static Vector2D to_world_space(const Vector2D &target, const Vector2D &heading, const Vector2D &side, const Vector2D &pos) {
-
-	Vector2D res = Vector2D(heading.x()*target.x() + side.x()*target.y(), heading.y()*target.x() + side.y()*target.y());
-	res += pos;
-	return res;
-}
-
-static Vector2D to_local_space(const Vector2D &target, const Vector2D &heading, const Vector2D &side, const Vector2D &pos) {
-	Vector2D res = target - pos;
-	res = Vector2D(heading.x()*res.x() + heading.y()*res.y(), side.x()*res.x() + side.y()*res.y());
-	return res;
-}
-
 Vector2D SteeringBehavior::wander() {
 	m_wander_target += Vector2D(m_wander_jitter*(my_rand.drand()-0.5)*2.0, m_wander_jitter*(my_rand.drand()-0.5)*2.0);
 	m_wander_target = m_wander_target.get_normalized();
@@ -146,11 +137,11 @@ Vector2D SteeringBehavior::obstacle_avoidance(const std::vector<Obstacle*> &obst
 			Vector2D pos_local = to_local_space((*iter)->pos(), m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
 			//Vector2D pos_world = to_world_space(pos_local, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
 			double expanded_radius = (*iter)->bounding_radius() + m_vehicle->bounding_radius();
-			if (pos_local.x() > 0.0 && fabs(pos_local.y()) < expanded_radius) {
+			if (pos_local.m_x > 0.0 && fabs(pos_local.m_y) < expanded_radius) {
 				(*iter)->set_scale(Vector2D(2.0, 2.0));
-				double sqrt_part = sqrt(expanded_radius*expanded_radius - pos_local.y()*pos_local.y());
-				double inter_dist = pos_local.x() - sqrt_part;
-				if (inter_dist < 0.0) inter_dist = pos_local.x() + sqrt_part;
+				double sqrt_part = sqrt(expanded_radius*expanded_radius - pos_local.m_y*pos_local.m_y);
+				double inter_dist = pos_local.m_x - sqrt_part;
+				if (inter_dist < 0.0) inter_dist = pos_local.m_x + sqrt_part;
 				if (inter_dist < inter_max) {
 					inter_max = inter_dist;
 					inter_ob = *iter;
@@ -161,11 +152,11 @@ Vector2D SteeringBehavior::obstacle_avoidance(const std::vector<Obstacle*> &obst
 	}
 	if (inter_ob) {
 		inter_ob->set_scale(Vector2D(3.0, 3.0));
-		double weight = 1.0 + (detection_box_len - inter_local.x()) / detection_box_len;
-		double fy = inter_ob->bounding_radius() + m_vehicle->bounding_radius() - fabs(inter_local.y());
-		fy = inter_local.y() > 0 ? -fy : fy;
+		double weight = 1.0 + (detection_box_len - inter_local.m_x) / detection_box_len;
+		double fy = inter_ob->bounding_radius() + m_vehicle->bounding_radius() - fabs(inter_local.m_y);
+		fy = inter_local.m_y > 0 ? -fy : fy;
 		fy *= 15.0*weight;
-		double fx = -0.5*(detection_box_len + inter_ob->bounding_radius() - inter_local.x());
+		double fx = -0.5*(detection_box_len + inter_ob->bounding_radius() - inter_local.m_x);
 		res = Vector2D(fx, fy);
 		res = to_world_space(res, m_vehicle->heading(), m_vehicle->side(), Vector2D(0.0, 0.0));
 	}
@@ -185,3 +176,50 @@ void SteeringBehavior::render_detection_box() {
 	}
 	my_gdi.draw_closed_shape(pts);
 }
+
+Vector2D SteeringBehavior::wall_avoidance(const std::vector<Wall*> &walls) {
+	Vector2D force;
+	// create three feelers
+	std::vector<Vector2D> feelers;
+	feelers.push_back(m_vehicle->pos() + m_vehicle->heading()*m_vehicle->scale().length() * 4);
+	feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() + m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 4);
+	feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() - m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 4);
+	// find the nearest wall that intersects with any of the feelers
+	for (auto itf = feelers.begin(); itf != feelers.end(); ++itf) {
+		Wall *pwall = nullptr; // pointer to nearest intersecting wall
+		Vector2D ipt; // nearest intersection point
+		double dist_to_ipt = std::numeric_limits<double>::infinity(); // distance to the nearest intersecting point
+		for (auto iter = (m_vehicle->world()->walls()).begin(); iter != (m_vehicle->world()->walls()).end(); ++iter) {
+			if (intersect_two_lines(m_vehicle->pos(), *itf, (*iter)->from(), (*iter)->to())) {
+				Vector2D tmp_pt;
+				double dist = find_intersecting_point(m_vehicle->pos(), *itf, (*iter)->from(), (*iter)->to(), tmp_pt);
+				if (dist < dist_to_ipt) {
+					dist_to_ipt = dist;
+					ipt = tmp_pt;
+					pwall = *iter;
+				}
+			}
+		}
+		if (pwall) {
+			Vector2D overshoot = *itf - ipt;
+			Vector2D steering = pwall->normal();
+			steering *= overshoot.length();
+			force += steering;
+		}
+	}
+	// if any wall, calculate the force
+	return force;
+}
+
+void SteeringBehavior::render_feeler() {
+	if (!m_wall_avoidance_flag) return;
+	std::vector<Vector2D> feelers;
+	feelers.push_back(m_vehicle->pos() + m_vehicle->heading()*m_vehicle->scale().length() * 4);
+	feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() + m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 4);
+	feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() - m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 4);
+	for (auto iter = feelers.begin(); iter != feelers.end(); ++iter) {
+		my_gdi.draw_feeler(m_vehicle->pos(), *iter);
+	}
+}
+
+
