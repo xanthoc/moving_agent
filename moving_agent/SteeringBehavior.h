@@ -27,6 +27,11 @@ class SteeringBehavior
 
 	bool m_wall_avoidance_flag;
 
+	std::vector<Vector2D> m_feelers;
+	Wall *m_wall;
+	Vector2D m_ip; // intersecting point
+	Vector2D m_steering_force;
+
 public:
 	SteeringBehavior(Vehicle *vehicle);
 	~SteeringBehavior();
@@ -39,9 +44,12 @@ public:
 	Vector2D wander();
 	Vector2D obstacle_avoidance(const std::vector<Obstacle*> &obstacles);
 	Vector2D wall_avoidance(const std::vector<Wall*> &walls);
+
 	void render_wander_status();
 	void render_detection_box();
 	void render_feeler();
+	void render_steering_force();
+
 	void set_seek(bool val) { m_seek_flag = val; }
 	void set_flee(bool val) { m_flee_flag = val; }
 	void set_arrive(bool val) { m_arrive_flag = val; }

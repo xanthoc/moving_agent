@@ -50,14 +50,16 @@ Vector2D SteeringBehavior::calculate() {
 		Vector2D tmp = wander();
 		if (!accumulate_force(force, tmp)) return force;
 	}
+	m_steering_force = force;
 	return force;
 }
 
 bool SteeringBehavior::accumulate_force(Vector2D &running_total, const Vector2D &force_to_add) {
 	double mag_so_far = running_total.length();
 	double mag_remaining = m_vehicle->max_force() - mag_so_far;
-	if (mag_remaining < 0.0) return false;
+	if (mag_remaining <= 0.0) return false;
 	double mag_to_add = force_to_add.length();
+	if (mag_to_add == 0.0) return true; // nothing to add, so just return
 	if (mag_to_add < mag_remaining) {
 		running_total += force_to_add;
 	}
@@ -180,46 +182,48 @@ void SteeringBehavior::render_detection_box() {
 Vector2D SteeringBehavior::wall_avoidance(const std::vector<Wall*> &walls) {
 	Vector2D force;
 	// create three feelers
-	std::vector<Vector2D> feelers;
-	feelers.push_back(m_vehicle->pos() + m_vehicle->heading()*m_vehicle->scale().length() * 4);
-	feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() + m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 4);
-	feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() - m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 4);
+	m_feelers.erase(m_feelers.begin(), m_feelers.end());
+	m_feelers.push_back(m_vehicle->pos() + m_vehicle->heading()*m_vehicle->scale().length() * 6);
+	m_feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() + m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 6);
+	m_feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() - m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 6);
 	// find the nearest wall that intersects with any of the feelers
-	for (auto itf = feelers.begin(); itf != feelers.end(); ++itf) {
-		Wall *pwall = nullptr; // pointer to nearest intersecting wall
-		Vector2D ipt; // nearest intersection point
-		double dist_to_ipt = std::numeric_limits<double>::infinity(); // distance to the nearest intersecting point
+	m_wall = nullptr; // pointer to nearest intersecting wall
+	double dist_to_ipt = std::numeric_limits<double>::infinity(); // distance to the nearest intersecting point
+	Vector2D tmp_pt;
+	Vector2D overshoot;
+	for (auto itf = m_feelers.begin(); itf != m_feelers.end(); ++itf) {
+		//Vector2D ipt; // nearest intersection point
 		for (auto iter = (m_vehicle->world()->walls()).begin(); iter != (m_vehicle->world()->walls()).end(); ++iter) {
-			if (intersect_two_lines(m_vehicle->pos(), *itf, (*iter)->from(), (*iter)->to())) {
-				Vector2D tmp_pt;
-				double dist = find_intersecting_point(m_vehicle->pos(), *itf, (*iter)->from(), (*iter)->to(), tmp_pt);
+			if (intersect_two_lines(m_vehicle->pos(), *itf, (*iter)->from(), (*iter)->to(), tmp_pt)) {
+				double dist = (tmp_pt - m_vehicle->pos()).length();
 				if (dist < dist_to_ipt) {
 					dist_to_ipt = dist;
-					ipt = tmp_pt;
-					pwall = *iter;
+					m_ip = tmp_pt;
+					m_wall = *iter;
+					overshoot = *itf - m_ip;
 				}
 			}
 		}
-		if (pwall) {
-			Vector2D overshoot = *itf - ipt;
-			Vector2D steering = pwall->normal();
-			steering *= overshoot.length();
-			force += steering;
-		}
 	}
 	// if any wall, calculate the force
+	if (m_wall) {
+		Vector2D steering = m_wall->normal();
+		steering *= overshoot.length_sq();
+		force = steering;
+	}
 	return force;
 }
 
 void SteeringBehavior::render_feeler() {
 	if (!m_wall_avoidance_flag) return;
-	std::vector<Vector2D> feelers;
-	feelers.push_back(m_vehicle->pos() + m_vehicle->heading()*m_vehicle->scale().length() * 4);
-	feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() + m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 4);
-	feelers.push_back(m_vehicle->pos() + (m_vehicle->heading() - m_vehicle->side()).get_normalized()*m_vehicle->scale().length() * 4);
-	for (auto iter = feelers.begin(); iter != feelers.end(); ++iter) {
+	for (auto iter = m_feelers.begin(); iter != m_feelers.end(); ++iter) {
 		my_gdi.draw_feeler(m_vehicle->pos(), *iter);
 	}
+	if (m_wall) my_gdi.draw_circle(m_ip, 5);
+}
+
+void SteeringBehavior::render_steering_force() {
+	my_gdi.draw_force(m_vehicle->pos(), m_vehicle->pos()+m_steering_force);
 }
 
 

@@ -73,7 +73,11 @@ void GameWorld::render() {
 
 	my_gdi.draw_image(m_target, 57.0, 57.0, m_hdcmem);
 
-	for (auto iter = m_agents.begin(); iter != m_agents.end(); ++iter) (*iter)->render();
+	for (auto iter = m_agents.begin(); iter != m_agents.end(); ++iter) {
+		(*iter)->render();
+		text_len = wsprintf(buf, TEXT("Agent pos = (%d, %d)"), static_cast<int>((*iter)->pos().m_x), static_cast<int>((*iter)->pos().m_y));
+		my_gdi.draw_text_auto_pos(buf, text_len);
+	}
 
 }
 
@@ -85,8 +89,16 @@ void GameWorld::create_wall() {
 	to = Vector2D(m_width - offset, offset);
 	Wall *ob = new Wall(from, to);
 	m_walls.push_back(ob);
-	to = Vector2D(offset, m_height - offset);
+	from = Vector2D(m_width - offset, offset);
+	to = Vector2D(m_width - offset, m_height - offset);
+	ob = new Wall(from, to);
+	m_walls.push_back(ob);
 	from = Vector2D(m_width - offset, m_height - offset);
+	to = Vector2D(offset, m_height - offset);
+	ob = new Wall(from, to);
+	m_walls.push_back(ob);
+	from = Vector2D(offset, m_height - offset);
+	to = Vector2D(offset, offset);
 	ob = new Wall(from, to);
 	m_walls.push_back(ob);
 }
@@ -119,7 +131,7 @@ void GameWorld::create_agent() {
 		ob->set_obstacle_avoidance(true);
 		ob->set_wander(true);
 		//ob->set_arrive(true);
-		ob->set_pos(Vector2D(my_rand.drand(0.0, m_width), my_rand.drand(0, m_height)));
+		ob->set_pos(Vector2D(my_rand.drand(m_width / 4, m_width * 3 / 4), my_rand.drand(m_height/4, m_height*3/4)));
 		m_agents.push_back(ob);
 	}
 }

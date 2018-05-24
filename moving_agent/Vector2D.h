@@ -39,6 +39,7 @@ public:
 	Vector2D get_normalized() const {
 		Vector2D res;
 		double len = length();
+		assert(len != 0.0);
 		res.m_x = m_x / len;
 		res.m_y = m_y / len;
 		return res;

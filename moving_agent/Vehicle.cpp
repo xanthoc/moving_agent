@@ -64,4 +64,5 @@ void Vehicle::render() {
 	m_steering->render_wander_status();
 	m_steering->render_detection_box();
 	m_steering->render_feeler();
+	m_steering->render_steering_force();
 }

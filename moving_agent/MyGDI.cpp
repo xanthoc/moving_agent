@@ -93,4 +93,13 @@ void MyGDI::draw_feeler(const Vector2D &from, const Vector2D &to) {
 	LineTo(m_hdc, to.m_x, to.m_y);
 }
 
+void MyGDI::draw_force(const Vector2D &from, const Vector2D &to) {
+	HPEN force_pen = CreatePen(PS_SOLID, 5, RGB(255, 0, 0));
+	HPEN old_pen = (HPEN)SelectObject(m_hdc, force_pen);
+	MoveToEx(m_hdc, from.m_x, from.m_y, nullptr);
+	LineTo(m_hdc, to.m_x, to.m_y);
+	SelectObject(m_hdc, old_pen);
+	DeleteObject(force_pen);
+}
+
 
