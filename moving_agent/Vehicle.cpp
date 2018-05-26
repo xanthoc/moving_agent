@@ -5,18 +5,14 @@
 #include "Vector2D.h"
 #include "MyGDI.h"
 
-Vehicle::Vehicle(GameWorld *world) : m_world(world), m_steering(new SteeringBehavior(this))
-{
+Vehicle::Vehicle(GameWorld *world, Color color) : m_world(world), m_color(color), m_steering(new SteeringBehavior(this)) {
 	m_scale = Vector2D(10.0, 10.0);
 	m_bounding_radius = 6;
 }
 
-
-Vehicle::~Vehicle()
-{
+Vehicle::~Vehicle() {
 	delete m_steering;
 }
-
 
 void Vehicle::update(double time_elapsed) {
 	Vector2D steering_force = m_steering->calculate();
@@ -59,10 +55,12 @@ void Vehicle::render() {
 		pts[i] += m_pos;
 	}
 
-	my_gdi.draw_closed_shape(pts);
+	if (m_color == RED) my_gdi.draw_closed_shape_filled_red(pts);
+	else my_gdi.draw_closed_shape(pts);
 
+	m_steering->render_steering_force();
 	m_steering->render_wander_status();
 	m_steering->render_detection_box();
 	m_steering->render_feeler();
-	m_steering->render_steering_force();
+	m_steering->render_places_to_hide();
 }

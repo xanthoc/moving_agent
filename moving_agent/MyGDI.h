@@ -20,6 +20,7 @@ public:
 	void draw_light_gray_circle(const Vector2D &c, double r);
 	void draw_image(const Vector2D &c, double sx, double sy, HDC image);
 	void draw_closed_shape(const std::vector<Vector2D> &pts);
+	void draw_closed_shape_filled_red(const std::vector<Vector2D> &pts);
 	void draw_empty_circle(const Vector2D &c, double r);
 	void draw_text_auto_pos(const TCHAR *buf, int len);
 	void reset_text_auto_pos() { m_cnt_text = 0; }

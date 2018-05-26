@@ -125,6 +125,7 @@ void GameWorld::create_obstacle() {
 }
 
 void GameWorld::create_agent() {
+	/*
 	for (int i = 0; i < app_param.num_agents(); ++i) {
 		Vehicle *ob = new Vehicle(this);
 		ob->set_wall_avoidance(true);
@@ -134,4 +135,21 @@ void GameWorld::create_agent() {
 		ob->set_pos(Vector2D(my_rand.drand(m_width / 4, m_width * 3 / 4), my_rand.drand(m_height/4, m_height*3/4)));
 		m_agents.push_back(ob);
 	}
+	*/
+	Vehicle *ob = new Vehicle(this);
+	//ob->set_wall_avoidance(true);
+	ob->set_obstacle_avoidance(true);
+	ob->set_wander(true);
+	//ob->set_arrive(true);
+	ob->set_pos(Vector2D(my_rand.drand(m_width / 4, m_width * 3 / 4), my_rand.drand(m_height / 4, m_height * 3 / 4)));
+	m_agents.push_back(ob);
+
+	ob = new Vehicle(this, Vehicle::RED);
+	//ob->set_wall_avoidance(true);
+	ob->set_obstacle_avoidance(true);
+	ob->set_hide(true);
+	//ob->set_arrive(true);
+	ob->set_pos(Vector2D(my_rand.drand(m_width / 4, m_width * 3 / 4), my_rand.drand(m_height / 4, m_height * 3 / 4)));
+	m_agents.push_back(ob);
+
 }

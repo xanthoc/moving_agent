@@ -38,12 +38,16 @@ public:
 	void render();
 	void create_detail() {
 		// create_detail is called when WM_SIZE is received, so check whether each container is empty
-		if (m_walls.empty()) create_wall();
+		//if (m_walls.empty()) create_wall();
 		if (m_obstacles.empty()) create_obstacle();
 		if (m_agents.empty()) create_agent();
 	}
 	std::vector<Obstacle*> &obstacles() { return m_obstacles; }
 	std::vector<Wall*> &walls() { return m_walls; }
+	std::vector<Vehicle*> &agents() { return m_agents; }
+
+	Vehicle* wolf() { return m_agents[0]; }
+	Vehicle* sheep(int order = 1) { return m_agents[order]; }
 
 };
 

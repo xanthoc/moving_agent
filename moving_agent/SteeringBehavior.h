@@ -6,31 +6,29 @@
 
 class Vehicle;
 
-class SteeringBehavior
-{
+class SteeringBehavior {
 	Vehicle *m_vehicle;
+
 	bool m_seek_flag;
 	bool m_flee_flag;
-
 	bool m_arrive_flag;
-	enum Deceleration { SLOW = 3, NORMAL = 2, FAST = 1 };
-
 	bool m_pursuit_flag;
-
 	bool m_wander_flag;
-	double m_wander_radius;
-	double m_wander_dist;
-	double m_wander_jitter;
-	Vector2D m_wander_target;
-
 	bool m_obstacle_avoidance_flag;
-
 	bool m_wall_avoidance_flag;
+	bool m_hide_flag;
+
+	enum Deceleration { SLOW = 3, NORMAL = 2, FAST = 1 };	// for arrive
+	double m_wander_radius; // for wander
+	double m_wander_dist; // for wander
+	double m_wander_jitter; // for wander
+	Vector2D m_wander_target; // for wander
 
 	std::vector<Vector2D> m_feelers;
 	Wall *m_wall;
-	Vector2D m_ip; // intersecting point
-	Vector2D m_steering_force;
+	Vector2D m_ip; // intersecting point, for debugging
+	Vector2D m_steering_force; // for debugging
+	std::vector<Vector2D> m_places_to_hide;
 
 public:
 	SteeringBehavior(Vehicle *vehicle);
@@ -44,11 +42,13 @@ public:
 	Vector2D wander();
 	Vector2D obstacle_avoidance(const std::vector<Obstacle*> &obstacles);
 	Vector2D wall_avoidance(const std::vector<Wall*> &walls);
+	Vector2D hide(const Vector2D &target, const std::vector<Obstacle*> &obstacles);
 
+	void render_steering_force();
 	void render_wander_status();
 	void render_detection_box();
 	void render_feeler();
-	void render_steering_force();
+	void render_places_to_hide();
 
 	void set_seek(bool val) { m_seek_flag = val; }
 	void set_flee(bool val) { m_flee_flag = val; }
@@ -57,5 +57,6 @@ public:
 	void set_wander(bool val) { m_wander_flag = val; }
 	void set_obstacle_avoidance(bool val) { m_obstacle_avoidance_flag = val; }
 	void set_wall_avoidance(bool val) { m_wall_avoidance_flag = val; }
+	void set_hide(bool val) { m_hide_flag = val; }
 };
 

@@ -58,6 +58,25 @@ void MyGDI::draw_closed_shape(const std::vector<Vector2D> &pts) {
 	LineTo(m_hdc, (int)pts[0].m_x, (int)pts[0].m_y);
 }
 
+void MyGDI::draw_closed_shape_filled_red(const std::vector<Vector2D> &pts) {
+	// convert vector to POINT array
+	int size = pts.size();
+	PPOINT parr = new POINT[size];
+	for (int i = 0; i < size; ++i) {
+		parr[i].x = static_cast<LONG>(pts[i].m_x);
+		parr[i].y = static_cast<LONG>(pts[i].m_y);
+	}
+	HPEN red_pen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+	HPEN old_pen = (HPEN)SelectObject(m_hdc, red_pen);
+	HBRUSH red_brush = CreateSolidBrush(RGB(255, 0, 0));
+	HBRUSH old_brush = (HBRUSH)SelectObject(m_hdc, red_brush);
+	Polygon(m_hdc, parr, size);
+	SelectObject(m_hdc, old_brush);
+	SelectObject(m_hdc, old_pen);
+	DeleteObject(red_brush);
+	DeleteObject(red_pen);
+}
+
 void MyGDI::draw_empty_circle(const Vector2D &c, double r) {
 	HBRUSH old_brush = (HBRUSH)SelectObject(m_hdc, GetStockObject(NULL_BRUSH));
 	Ellipse(m_hdc, static_cast<int>(c.m_x - r), static_cast<int>(c.m_y - r), static_cast<int>(c.m_x + r), static_cast<int>(c.m_y + r));

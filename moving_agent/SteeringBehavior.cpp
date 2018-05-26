@@ -9,7 +9,8 @@
 #include "Geometry.h"
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
-m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
+m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false), 
+m_obstacle_avoidance_flag(false), m_wall_avoidance_flag(false), m_hide_flag(false),
 m_wander_radius(20.0), m_wander_dist(50.0), m_wander_jitter(30.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
 {
 }
@@ -30,13 +31,17 @@ Vector2D SteeringBehavior::calculate() {
 		Vector2D tmp = obstacle_avoidance(m_vehicle->world()->obstacles());
 		if (!accumulate_force(force, tmp)) return force;
 	}
+	if (m_hide_flag) {
+		Vector2D tmp = hide(m_vehicle->world()->wolf()->pos(), m_vehicle->world()->obstacles());
+		if (!accumulate_force(force, tmp)) return force;
+	}
 	if (m_flee_flag) {
-//		Vector2D tmp = flee(m_vehicle->world()->wolf()->pos());
-//		if (!accumulate_force(force, tmp)) return force;
+		Vector2D tmp = flee(m_vehicle->world()->wolf()->pos());
+		if (!accumulate_force(force, tmp)) return force;
 	}
 	if (m_pursuit_flag) {
-//		Vector2D tmp = pursuit(m_vehicle->world()->sheep());
-//		if (!accumulate_force(force, tmp)) return force;
+		Vector2D tmp = pursuit(m_vehicle->world()->sheep());
+		if (!accumulate_force(force, tmp)) return force;
 	}
 	if (m_seek_flag) {
 		Vector2D tmp = seek(m_vehicle->world()->target());
@@ -165,20 +170,6 @@ Vector2D SteeringBehavior::obstacle_avoidance(const std::vector<Obstacle*> &obst
 	return res;
 }
 
-void SteeringBehavior::render_detection_box() {
-	if (!m_obstacle_avoidance_flag) return;
-	double detection_box_len = app_param.min_detection_box_length()*(1.0 + m_vehicle->velocity().length() / m_vehicle->max_speed());
-	std::vector<Vector2D> pts;
-	pts.push_back(Vector2D(0, m_vehicle->bounding_radius()));
-	pts.push_back(Vector2D(0, -m_vehicle->bounding_radius()));
-	pts.push_back(Vector2D(detection_box_len, -m_vehicle->bounding_radius()));
-	pts.push_back(Vector2D(detection_box_len, m_vehicle->bounding_radius()));
-	for (unsigned i = 0; i < pts.size(); ++i) {
-		pts[i] = to_world_space(pts[i], m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
-	}
-	my_gdi.draw_closed_shape(pts);
-}
-
 Vector2D SteeringBehavior::wall_avoidance(const std::vector<Wall*> &walls) {
 	Vector2D force;
 	// create three feelers
@@ -214,6 +205,53 @@ Vector2D SteeringBehavior::wall_avoidance(const std::vector<Wall*> &walls) {
 	return force;
 }
 
+Vector2D SteeringBehavior::hide(const Vector2D &target, const std::vector<Obstacle*> &obstacles) {
+	Vector2D force;
+	m_places_to_hide.erase(m_places_to_hide.begin(), m_places_to_hide.end());
+	const int separation = 20;
+	for (auto iter = obstacles.begin(); iter != obstacles.end(); ++iter) {
+		Vector2D tmp = (*iter)->pos() - target;
+		tmp = tmp.get_normalized();
+		tmp *= (*iter)->bounding_radius() + separation;
+		tmp += (*iter)->pos();
+		m_places_to_hide.push_back(tmp);
+	}
+	double max_dist = std::numeric_limits<double>::infinity();
+	Vector2D nearest;
+	for (auto iter = m_places_to_hide.begin(); iter != m_places_to_hide.end(); ++iter) {
+		double dist = (*iter - m_vehicle->pos()).length_sq();
+		if (dist < max_dist) {
+			max_dist = dist;
+			nearest = *iter;
+		}
+	}
+	if (max_dist < std::numeric_limits<double>::infinity()) {
+		force = arrive(nearest, FAST);
+	}
+	else {
+		force = flee(target);
+	}
+	return force;
+}
+
+void SteeringBehavior::render_steering_force() {
+	my_gdi.draw_force(m_vehicle->pos(), m_vehicle->pos()+m_steering_force);
+}
+
+void SteeringBehavior::render_detection_box() {
+	if (!m_obstacle_avoidance_flag) return;
+	double detection_box_len = app_param.min_detection_box_length()*(1.0 + m_vehicle->velocity().length() / m_vehicle->max_speed());
+	std::vector<Vector2D> pts;
+	pts.push_back(Vector2D(0, m_vehicle->bounding_radius()));
+	pts.push_back(Vector2D(0, -m_vehicle->bounding_radius()));
+	pts.push_back(Vector2D(detection_box_len, -m_vehicle->bounding_radius()));
+	pts.push_back(Vector2D(detection_box_len, m_vehicle->bounding_radius()));
+	for (unsigned i = 0; i < pts.size(); ++i) {
+		pts[i] = to_world_space(pts[i], m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
+	}
+	my_gdi.draw_closed_shape(pts);
+}
+
 void SteeringBehavior::render_feeler() {
 	if (!m_wall_avoidance_flag) return;
 	for (auto iter = m_feelers.begin(); iter != m_feelers.end(); ++iter) {
@@ -222,8 +260,11 @@ void SteeringBehavior::render_feeler() {
 	if (m_wall) my_gdi.draw_circle(m_ip, 5);
 }
 
-void SteeringBehavior::render_steering_force() {
-	my_gdi.draw_force(m_vehicle->pos(), m_vehicle->pos()+m_steering_force);
+void SteeringBehavior::render_places_to_hide() {
+	if (!m_hide_flag) return;
+	for (auto iter = m_places_to_hide.begin(); iter != m_places_to_hide.end(); ++iter) {
+		my_gdi.draw_circle(*iter, 5);
+	}
 }
 
 
