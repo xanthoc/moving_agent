@@ -1,27 +1,27 @@
 #pragma once
 #include "Vector2D.h"
 
-Vector2D to_world_space(const Vector2D &target, const Vector2D &heading, const Vector2D &side, const Vector2D &pos) {
+inline Vector2D to_world_space(const Vector2D &target, const Vector2D &heading, const Vector2D &side, const Vector2D &pos) {
 
 	Vector2D res = Vector2D(heading.m_x*target.m_x + side.m_x*target.m_y, heading.m_y*target.m_x + side.m_y*target.m_y);
 	res += pos;
 	return res;
 }
 
-Vector2D to_local_space(const Vector2D &target, const Vector2D &heading, const Vector2D &side, const Vector2D &pos) {
+inline Vector2D to_local_space(const Vector2D &target, const Vector2D &heading, const Vector2D &side, const Vector2D &pos) {
 	Vector2D res = target - pos;
 	res = Vector2D(heading.m_x*res.m_x + heading.m_y*res.m_y, side.m_x*res.m_x + side.m_y*res.m_y);
 	return res;
 }
 
-int orientation(const Vector2D &p1, const Vector2D &p2, const Vector2D &p3) {
+inline int orientation(const Vector2D &p1, const Vector2D &p2, const Vector2D &p3) {
 	// think of cross product of two vectors: p1p2, p2p3
 	double val = (p2.m_x - p1.m_x)*(p3.m_y - p2.m_y) - (p3.m_x - p2.m_x)*(p2.m_y - p1.m_y);
 	if (val == 0.0) return 0; // colinear
 	return val < 0.0 ? 1 : -1; // 1: clockwise, -1: counter clockwise
 }
 
-Vector2D find_intersection(const Vector2D &p1, const Vector2D &q1, const Vector2D &p2, const Vector2D &q2) {
+inline Vector2D find_intersection(const Vector2D &p1, const Vector2D &q1, const Vector2D &p2, const Vector2D &q2) {
 	//a1x + b1y = c1
 	double a1 = q1.m_y - p1.m_y;
 	double b1 = p1.m_x - q1.m_x;
@@ -39,11 +39,11 @@ Vector2D find_intersection(const Vector2D &p1, const Vector2D &q1, const Vector2
 	return Vector2D(x, y);
 }
 
-bool on_segment(const Vector2D &p, const Vector2D &q, const Vector2D &r) {
+inline bool on_segment(const Vector2D &p, const Vector2D &q, const Vector2D &r) {
 	return min(p.m_x, q.m_x) <= r.m_x && r.m_x <= max(p.m_x, q.m_x) && min(p.m_y, q.m_y) <= r.m_y && r.m_y <= max(p.m_y, q.m_y);
 }
 
-bool intersect_two_lines(const Vector2D &p1, const Vector2D &q1, const Vector2D &p2, const Vector2D &q2, Vector2D &pt) {
+inline bool intersect_two_lines(const Vector2D &p1, const Vector2D &q1, const Vector2D &p2, const Vector2D &q2, Vector2D &pt) {
 	int o11 = orientation(p1, q1, p2);
 	int o12 = orientation(p1, q1, q2);
 	int o21 = orientation(p2, q2, p1);

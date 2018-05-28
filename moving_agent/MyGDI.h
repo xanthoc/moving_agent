@@ -27,5 +27,7 @@ public:
 	void draw_wall(const Vector2D &from, const Vector2D &to, int width);
 	void draw_feeler(const Vector2D &from, const Vector2D &to);
 	void draw_force(const Vector2D &from, const Vector2D &to);
+	void draw_line(const Vector2D &from, const Vector2D &to);
+	void draw_dotted_line(const Vector2D &from, const Vector2D &to);
 };
 #define my_gdi MyGDI::instance()

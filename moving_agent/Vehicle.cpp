@@ -4,6 +4,7 @@
 #include <vector>
 #include "Vector2D.h"
 #include "MyGDI.h"
+#include "Geometry.h"
 
 Vehicle::Vehicle(GameWorld *world, Color color) : m_world(world), m_color(color), m_steering(new SteeringBehavior(this)) {
 	m_scale = Vector2D(10.0, 10.0);
@@ -43,16 +44,8 @@ void Vehicle::render() {
 		pts[i] = Vector2D(x, y);
 	}
 
-	// rotate
 	for (unsigned int i = 0; i < pts.size(); ++i) {
-		double x = m_heading.m_x*pts[i].m_x + m_side.m_x*pts[i].m_y;
-		double y = m_heading.m_y*pts[i].m_x + m_side.m_y*pts[i].m_y;
-		pts[i] = Vector2D(x, y);
-	}
-
-	// translate
-	for (unsigned int i = 0; i < pts.size(); ++i) {
-		pts[i] += m_pos;
+		pts[i] = to_world_space(pts[i], m_heading, m_side, m_pos);
 	}
 
 	if (m_color == RED) my_gdi.draw_closed_shape_filled_red(pts);
@@ -63,4 +56,5 @@ void Vehicle::render() {
 	m_steering->render_detection_box();
 	m_steering->render_feeler();
 	m_steering->render_places_to_hide();
+	m_steering->render_path();
 }

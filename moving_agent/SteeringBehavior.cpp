@@ -8,9 +8,9 @@
 #include "EntityFunctionTemplates.h"
 #include "Geometry.h"
 
-SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle), 
-m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false), 
-m_obstacle_avoidance_flag(false), m_wall_avoidance_flag(false), m_hide_flag(false),
+SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle),
+m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
+m_obstacle_avoidance_flag(false), m_wall_avoidance_flag(false), m_hide_flag(false), m_path_following_flag(false),
 m_wander_radius(20.0), m_wander_dist(50.0), m_wander_jitter(30.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
 {
 }
@@ -53,6 +53,10 @@ Vector2D SteeringBehavior::calculate() {
 	}
 	if (m_wander_flag) {
 		Vector2D tmp = wander();
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_path_following_flag) {
+		Vector2D tmp = path_following();
 		if (!accumulate_force(force, tmp)) return force;
 	}
 	m_steering_force = force;
@@ -234,6 +238,11 @@ Vector2D SteeringBehavior::hide(const Vector2D &target, const std::vector<Obstac
 	return force;
 }
 
+Vector2D SteeringBehavior::path_following() {
+	Vector2D force;
+	return force;
+}
+
 void SteeringBehavior::render_steering_force() {
 	my_gdi.draw_force(m_vehicle->pos(), m_vehicle->pos()+m_steering_force);
 }
@@ -265,6 +274,19 @@ void SteeringBehavior::render_places_to_hide() {
 	for (auto iter = m_places_to_hide.begin(); iter != m_places_to_hide.end(); ++iter) {
 		my_gdi.draw_circle(*iter, 5);
 	}
+}
+
+void SteeringBehavior::render_path() {
+	if (!m_path_following_flag) return;
+	Vector2D prev;
+	for (auto iter = m_path.begin(); iter != m_path.end(); ++iter) {
+		my_gdi.draw_circle(*iter, 3);
+		if (iter != m_path.begin()) {
+			my_gdi.draw_line(prev, *iter);
+		}
+		prev = *iter;
+	}
+	if (m_path.size()) my_gdi.draw_dotted_line(prev, *m_path.begin());
 }
 
 

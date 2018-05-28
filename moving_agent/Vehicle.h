@@ -26,5 +26,6 @@ public:
 	void set_obstacle_avoidance(bool val) { m_steering->set_obstacle_avoidance(val); }
 	void set_wall_avoidance(bool val) { m_steering->set_wall_avoidance(val); }
 	void set_hide(bool val) { m_steering->set_hide(val); }
+	void set_path_following(bool val) { m_steering->set_path_following(val); }
 };
 

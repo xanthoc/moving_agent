@@ -121,4 +121,17 @@ void MyGDI::draw_force(const Vector2D &from, const Vector2D &to) {
 	DeleteObject(force_pen);
 }
 
+void MyGDI::draw_line(const Vector2D &from, const Vector2D &to) {
+	MoveToEx(m_hdc, from.m_x, from.m_y, nullptr);
+	LineTo(m_hdc, to.m_x, to.m_y);
+}
+
+void MyGDI::draw_dotted_line(const Vector2D &from, const Vector2D &to) {
+	HPEN dot_pen = CreatePen(PS_DOT, 1, RGB(0, 0, 0));
+	HPEN old_pen = (HPEN)SelectObject(m_hdc, dot_pen);
+	MoveToEx(m_hdc, from.m_x, from.m_y, nullptr);
+	LineTo(m_hdc, to.m_x, to.m_y);
+	SelectObject(m_hdc, old_pen);
+	DeleteObject(dot_pen);
+}
 
