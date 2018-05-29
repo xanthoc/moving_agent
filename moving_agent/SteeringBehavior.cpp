@@ -11,7 +11,8 @@
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle),
 m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
 m_obstacle_avoidance_flag(false), m_wall_avoidance_flag(false), m_hide_flag(false), m_path_following_flag(false),
-m_wander_radius(20.0), m_wander_dist(50.0), m_wander_jitter(30.0), m_wander_target(Vector2D(m_wander_radius, 0.0))
+m_wander_radius(20.0), m_wander_dist(50.0), m_wander_jitter(30.0), m_wander_target(Vector2D(m_wander_radius, 0.0)),
+m_way_point_seek_dist_sq(1000.0)
 {
 }
 
@@ -240,6 +241,10 @@ Vector2D SteeringBehavior::hide(const Vector2D &target, const std::vector<Obstac
 
 Vector2D SteeringBehavior::path_following() {
 	Vector2D force;
+	Vector2D dist = m_path.current_way_point() - m_vehicle->pos();
+	if (dist.length_sq() < m_way_point_seek_dist_sq && !m_path.finished()) m_path.set_next_way_point();
+	if (m_path.finished()) force = arrive(m_path.current_way_point(), FAST);
+	else force = seek(m_path.current_way_point());
 	return force;
 }
 

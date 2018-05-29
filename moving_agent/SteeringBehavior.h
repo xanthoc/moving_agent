@@ -26,6 +26,7 @@ class SteeringBehavior {
 	double m_wander_jitter; // for wander
 	Vector2D m_wander_target; // for wander
 	Path m_path; // for path following
+	double m_way_point_seek_dist_sq; // for path following
 
 	std::vector<Vector2D> m_feelers;
 	Wall *m_wall;
