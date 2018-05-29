@@ -23,5 +23,7 @@ public:
 	double max_speed() const { return m_max_speed; }
 	double max_force() const { return m_max_force; }
 	double max_turn_rate() const { return m_max_turn_rate; }
+
+	void set_max_speed(double val) { m_max_speed = val; }
 };
 

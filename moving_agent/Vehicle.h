@@ -27,5 +27,8 @@ public:
 	void set_wall_avoidance(bool val) { m_steering->set_wall_avoidance(val); }
 	void set_hide(bool val) { m_steering->set_hide(val); }
 	void set_path_following(bool val) { m_steering->set_path_following(val); }
+	void set_offset_pursuit(bool val) { m_steering->set_offset_pursuit(val); }
+
+	void set_offset(const Vector2D &offset) { m_steering->set_offset(offset); }
 };
 

@@ -10,7 +10,7 @@
 
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle),
 m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
-m_obstacle_avoidance_flag(false), m_wall_avoidance_flag(false), m_hide_flag(false), m_path_following_flag(false),
+m_obstacle_avoidance_flag(false), m_wall_avoidance_flag(false), m_hide_flag(false), m_path_following_flag(false), m_offset_pursuit_flag(false),
 m_wander_radius(20.0), m_wander_dist(50.0), m_wander_jitter(30.0), m_wander_target(Vector2D(m_wander_radius, 0.0)),
 m_way_point_seek_dist_sq(1000.0)
 {
@@ -58,6 +58,10 @@ Vector2D SteeringBehavior::calculate() {
 	}
 	if (m_path_following_flag) {
 		Vector2D tmp = path_following();
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_offset_pursuit_flag) {
+		Vector2D tmp = offset_pursuit();
 		if (!accumulate_force(force, tmp)) return force;
 	}
 	m_steering_force = force;
@@ -248,6 +252,16 @@ Vector2D SteeringBehavior::path_following() {
 	return force;
 }
 
+Vector2D SteeringBehavior::offset_pursuit() {
+	Vector2D force;
+	Vehicle *leader = m_vehicle->world()->wolf();
+	Vector2D offset_world = to_world_space(m_offset, leader->heading(), leader->side(), leader->pos());
+	Vector2D to_offset = offset_world - m_vehicle->pos();
+	double time_ahead = to_offset.length() / (m_vehicle->max_speed() + leader->max_speed());
+	force = arrive(offset_world + leader->velocity()*time_ahead, FAST);
+	return force;
+}
+
 void SteeringBehavior::render_steering_force() {
 	my_gdi.draw_force(m_vehicle->pos(), m_vehicle->pos()+m_steering_force);
 }
@@ -292,6 +306,13 @@ void SteeringBehavior::render_path() {
 		prev = *iter;
 	}
 	if (m_path.size()) my_gdi.draw_dotted_line(prev, *m_path.begin());
+}
+
+void SteeringBehavior::render_offset() {
+	if (!m_offset_pursuit_flag) return;
+	Vehicle *leader = m_vehicle->world()->wolf();
+	Vector2D offset_world = to_world_space(m_offset, leader->heading(), leader->side(), leader->pos());
+	my_gdi.draw_dark_gray_circle(offset_world, 5);
 }
 
 

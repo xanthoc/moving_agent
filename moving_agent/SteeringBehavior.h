@@ -19,6 +19,7 @@ class SteeringBehavior {
 	bool m_wall_avoidance_flag;
 	bool m_hide_flag;
 	bool m_path_following_flag;
+	bool m_offset_pursuit_flag;
 
 	enum Deceleration { SLOW = 3, NORMAL = 2, FAST = 1 };	// for arrive
 	double m_wander_radius; // for wander
@@ -27,6 +28,7 @@ class SteeringBehavior {
 	Vector2D m_wander_target; // for wander
 	Path m_path; // for path following
 	double m_way_point_seek_dist_sq; // for path following
+	Vector2D m_offset; // for offset pursuit
 
 	std::vector<Vector2D> m_feelers;
 	Wall *m_wall;
@@ -48,6 +50,7 @@ public:
 	Vector2D wall_avoidance(const std::vector<Wall*> &walls);
 	Vector2D hide(const Vector2D &target, const std::vector<Obstacle*> &obstacles);
 	Vector2D path_following();
+	Vector2D offset_pursuit();
 
 	void render_steering_force();
 	void render_wander_status();
@@ -55,6 +58,7 @@ public:
 	void render_feeler();
 	void render_places_to_hide();
 	void render_path();
+	void render_offset();
 
 	void set_seek(bool val) { m_seek_flag = val; }
 	void set_flee(bool val) { m_flee_flag = val; }
@@ -65,5 +69,8 @@ public:
 	void set_wall_avoidance(bool val) { m_wall_avoidance_flag = val; }
 	void set_hide(bool val) { m_hide_flag = val; }
 	void set_path_following(bool val) { m_path_following_flag = val; }
+	void set_offset_pursuit(bool val) { m_offset_pursuit_flag = val; }
+
+	void set_offset(const Vector2D &offset) { m_offset = offset; }
 };
 
