@@ -145,6 +145,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static HDC hdcmem;
 	static HBITMAP old_bitmap;
+	static FILE* fp_out = nullptr;
 
     switch (message)
     {
@@ -167,6 +168,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 	case WM_CREATE:
 		{
+			AllocConsole();
+			freopen_s(&fp_out, "CONOUT$", "w", stdout);
+
 			hdcmem = CreateCompatibleDC(NULL);
 			HDC hdc = GetDC(hWnd);
 			RECT rect;
@@ -230,6 +234,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		DeleteObject(old_bitmap);
 		DeleteDC(hdcmem);
         PostQuitMessage(0);
+
+		fclose(fp_out);
+		FreeConsole();
         break;
 	case WM_ERASEBKGND:
 		break;
