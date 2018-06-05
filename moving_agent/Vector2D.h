@@ -79,6 +79,12 @@ public:
 		m_y *= val;
 		return *this;
 	}
+	Vector2D& operator/=(double val) {
+		assert(val != 0.0);
+		m_x /= val;
+		m_y /= val;
+		return *this;
+	}
 	bool operator==(const Vector2D &other) const {
 		return (m_x == other.m_x && m_y == other.m_y);
 	}

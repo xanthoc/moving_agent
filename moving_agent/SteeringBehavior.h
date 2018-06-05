@@ -20,6 +20,9 @@ class SteeringBehavior {
 	bool m_hide_flag;
 	bool m_path_following_flag;
 	bool m_offset_pursuit_flag;
+	bool m_separation_flag;
+	bool m_alignment_flag;
+	bool m_cohesion_flag;
 
 	enum Deceleration { SLOW = 3, NORMAL = 2, FAST = 1 };	// for arrive
 	double m_wander_radius; // for wander
@@ -51,6 +54,9 @@ public:
 	Vector2D hide(const Vector2D &target, const std::vector<Obstacle*> &obstacles);
 	Vector2D path_following();
 	Vector2D offset_pursuit();
+	Vector2D separation();
+	Vector2D alignment();
+	Vector2D cohesion();
 
 	void render_steering_force();
 	void render_wander_status();
@@ -70,6 +76,9 @@ public:
 	void set_hide(bool val) { m_hide_flag = val; }
 	void set_path_following(bool val) { m_path_following_flag = val; }
 	void set_offset_pursuit(bool val) { m_offset_pursuit_flag = val; }
+	void set_separation(bool val) { m_separation_flag = val; }
+	void set_alignment(bool val) { m_alignment_flag = val; }
+	void set_cohesion(bool val) { m_cohesion_flag = val; }
 
 	void set_offset(const Vector2D &offset) { m_offset = offset; }
 };

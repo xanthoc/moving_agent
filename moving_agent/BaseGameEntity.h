@@ -8,7 +8,7 @@ protected:
 	Vector2D m_pos;
 	Vector2D m_scale;
 	double m_bounding_radius;
-	BaseGameEntity() : m_tag(false), m_scale(Vector2D(1.0, 1.0)), m_bounding_radius(0.0) {}
+	BaseGameEntity() : m_tag(false), m_scale(Vector2D(1.0, 1.0)), m_bounding_radius(1.0) {}
 	BaseGameEntity(const Vector2D &pos, double br) : m_tag(false), m_pos(pos), m_scale(Vector2D(1.0, 1.0)), m_bounding_radius(br) {}
 public:
 	virtual ~BaseGameEntity() {}

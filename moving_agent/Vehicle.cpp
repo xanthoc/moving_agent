@@ -52,10 +52,10 @@ void Vehicle::render() {
 	else my_gdi.draw_closed_shape(pts);
 
 	//m_steering->render_steering_force();
-	m_steering->render_wander_status();
+	//m_steering->render_wander_status();
 	m_steering->render_detection_box();
 	m_steering->render_feeler();
 	m_steering->render_places_to_hide();
 	m_steering->render_path();
-	//m_steering->render_offset();
+	m_steering->render_offset();
 }

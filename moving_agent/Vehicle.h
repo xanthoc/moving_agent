@@ -28,6 +28,9 @@ public:
 	void set_hide(bool val) { m_steering->set_hide(val); }
 	void set_path_following(bool val) { m_steering->set_path_following(val); }
 	void set_offset_pursuit(bool val) { m_steering->set_offset_pursuit(val); }
+	void set_separation(bool val) { m_steering->set_separation(val); }
+	void set_alignment(bool val) { m_steering->set_alignment(val); }
+	void set_cohesion(bool val) { m_steering->set_cohesion(val); }
 
 	void set_offset(const Vector2D &offset) { m_steering->set_offset(offset); }
 };

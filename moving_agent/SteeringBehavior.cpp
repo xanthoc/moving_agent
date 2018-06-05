@@ -11,6 +11,7 @@
 SteeringBehavior::SteeringBehavior(Vehicle *vehicle) : m_vehicle(vehicle),
 m_seek_flag(false), m_flee_flag(false), m_arrive_flag(false), m_pursuit_flag(false), m_wander_flag(false),
 m_obstacle_avoidance_flag(false), m_wall_avoidance_flag(false), m_hide_flag(false), m_path_following_flag(false), m_offset_pursuit_flag(false),
+m_separation_flag(false), m_alignment_flag(false), m_cohesion_flag(false),
 m_wander_radius(20.0), m_wander_dist(50.0), m_wander_jitter(30.0), m_wander_target(Vector2D(m_wander_radius, 0.0)),
 m_way_point_seek_dist_sq(1000.0)
 {
@@ -62,6 +63,22 @@ Vector2D SteeringBehavior::calculate() {
 	}
 	if (m_offset_pursuit_flag) {
 		Vector2D tmp = offset_pursuit();
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_separation_flag || m_alignment_flag || m_cohesion_flag) {
+		double detection_box_len = app_param.min_detection_box_length()*(1.0 + m_vehicle->velocity().length() / m_vehicle->max_speed());
+		tag_neighbor_same(m_vehicle, m_vehicle->world()->agents(), detection_box_len);
+	}
+	if (m_separation_flag) {
+		Vector2D tmp = separation();
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_alignment_flag) {
+		Vector2D tmp = alignment();
+		if (!accumulate_force(force, tmp)) return force;
+	}
+	if (m_cohesion_flag) {
+		Vector2D tmp = cohesion();
 		if (!accumulate_force(force, tmp)) return force;
 	}
 	m_steering_force = force;
@@ -154,7 +171,7 @@ Vector2D SteeringBehavior::obstacle_avoidance(const std::vector<Obstacle*> &obst
 			//Vector2D pos_world = to_world_space(pos_local, m_vehicle->heading(), m_vehicle->side(), m_vehicle->pos());
 			double expanded_radius = (*iter)->bounding_radius() + m_vehicle->bounding_radius();
 			if (pos_local.m_x > 0.0 && fabs(pos_local.m_y) < expanded_radius) {
-				(*iter)->set_scale(Vector2D(2.0, 2.0));
+				//(*iter)->set_scale(Vector2D(2.0, 2.0));
 				double sqrt_part = sqrt(expanded_radius*expanded_radius - pos_local.m_y*pos_local.m_y);
 				double inter_dist = pos_local.m_x - sqrt_part;
 				if (inter_dist < 0.0) inter_dist = pos_local.m_x + sqrt_part;
@@ -167,7 +184,7 @@ Vector2D SteeringBehavior::obstacle_avoidance(const std::vector<Obstacle*> &obst
 		}
 	}
 	if (inter_ob) {
-		inter_ob->set_scale(Vector2D(3.0, 3.0));
+		//inter_ob->set_scale(Vector2D(3.0, 3.0));
 		double weight = 1.0 + (detection_box_len - inter_local.m_x) / detection_box_len;
 		double fy = inter_ob->bounding_radius() + m_vehicle->bounding_radius() - fabs(inter_local.m_y);
 		fy = inter_local.m_y > 0 ? -fy : fy;
@@ -259,6 +276,55 @@ Vector2D SteeringBehavior::offset_pursuit() {
 	Vector2D to_offset = offset_world - m_vehicle->pos();
 	double time_ahead = to_offset.length() / (m_vehicle->max_speed() + leader->max_speed());
 	force = arrive(offset_world + leader->velocity()*time_ahead, FAST);
+	return force;
+}
+
+Vector2D SteeringBehavior::separation() {
+	Vector2D force;
+	auto tmp = m_vehicle->world()->agents();
+	for (auto iter = tmp.begin(); iter != tmp.end(); ++iter) {
+		if ((*iter)->is_tagged() && *iter != m_vehicle) {
+			Vector2D to_agent = m_vehicle->pos() - (*iter)->pos();
+			double dist = to_agent.length();
+			force += to_agent.get_normalized() * ( 500.0 / dist);
+		}
+	}
+	return force;
+}
+
+Vector2D SteeringBehavior::alignment() {
+	Vector2D force;
+	auto tmp = m_vehicle->world()->agents();
+	int num_neighbors = 0;
+	Vector2D ave_heading;
+	for (auto iter = tmp.begin(); iter != tmp.end(); ++iter) {
+		if ((*iter)->is_tagged() && *iter != m_vehicle) {
+			num_neighbors++;
+			ave_heading += (*iter)->heading();
+		}
+	}
+	if (num_neighbors) {
+		ave_heading /= num_neighbors;
+		force = ave_heading - m_vehicle->heading();
+	}
+	return force;
+}
+
+Vector2D SteeringBehavior::cohesion() {
+	Vector2D force;
+	auto tmp = m_vehicle->world()->agents();
+	int num_neighbors = 0;
+	Vector2D center;
+	for (auto iter = tmp.begin(); iter != tmp.end(); ++iter) {
+		if ((*iter)->is_tagged() && *iter != m_vehicle) {
+			num_neighbors++;
+			center += (*iter)->pos();
+		}
+	}
+	if (num_neighbors) {
+		center /= num_neighbors;
+		force = seek(center);
+	}
 	return force;
 }
 
