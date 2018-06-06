@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 template <typename T, typename ConT>
 bool is_overlapped(const T *ob, const ConT &con_ob, double min_dist) {
@@ -40,6 +41,28 @@ void tag_neighbor_same(const T *ob, const ConT &con_ob, double range) {
 		double dist = to.length() - (*iter)->bounding_radius();
 		if (dist < range) (*iter)->tag();
 	}
+}
+
+// tag_neighbor_same_cell shall be called when ob is in the container of con_ob
+template <typename T, typename ConT, typename ConU>
+void tag_neighbor_same_cell(const T *ob, const ConT &con_ob, const ConU &con_cell, double range) {
+	for (typename ConT::const_iterator iter = con_ob.begin(); iter != con_ob.end(); ++iter) {
+		(*iter)->untag();
+	}
+	Vector2D tl = Vector2D(ob->pos().m_x - range, ob->pos().m_y - range);
+	Vector2D br = Vector2D(ob->pos().m_x + range, ob->pos().m_y + range);
+	int overlapped_cell_cnt = 0;
+	for (typename ConU::const_iterator iter = con_cell.begin(); iter != con_cell.end(); ++iter) {
+		if (!(*iter).is_empty() && (*iter).is_overlapped(tl, br)) {
+		//if ((*iter).is_overlapped(tl, br)) {
+			(*iter).tag_neighbor(ob, range);
+			overlapped_cell_cnt++;
+		}
+	}
+	if (overlapped_cell_cnt > 12) {
+		overlapped_cell_cnt = 0;
+	}
+	std::cout << overlapped_cell_cnt << std::endl;
 }
 
 

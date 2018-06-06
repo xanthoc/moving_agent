@@ -67,7 +67,8 @@ Vector2D SteeringBehavior::calculate() {
 	}
 	if (m_separation_flag || m_alignment_flag || m_cohesion_flag) {
 		double detection_box_len = app_param.min_detection_box_length()*(1.0 + m_vehicle->velocity().length() / m_vehicle->max_speed());
-		tag_neighbor_same(m_vehicle, m_vehicle->world()->agents(), detection_box_len);
+		//tag_neighbor_same(m_vehicle, m_vehicle->world()->agents(), detection_box_len);
+		tag_neighbor_same_cell(m_vehicle, m_vehicle->world()->agents(), m_vehicle->world()->cells(), detection_box_len);
 	}
 	if (m_separation_flag) {
 		Vector2D tmp = separation();

@@ -11,6 +11,8 @@ GameWorld::GameWorld() {
 	m_old_crosshair = (HBITMAP)SelectObject(m_hdcmem, m_crosshair);
 	m_target = Vector2D(800, 200);
 	m_panic_dist = 100.0;
+	m_num_xcells = 7;
+	m_num_ycells = 5;
 
 }
 
@@ -31,14 +33,48 @@ GameWorld::~GameWorld()
 	}
 }
 
+int GameWorld::get_cell_id(const Vector2D &pos) {
+	double width = ((double)m_width) / m_num_xcells;
+	double height = ((double)m_height) / m_num_ycells;
+	int i_idx = (int)(pos.m_y / height); if (i_idx == m_num_ycells) --i_idx;
+	int j_idx = (int)(pos.m_x / width); if (j_idx == m_num_xcells) --j_idx;
+	assert(i_idx < m_num_ycells && j_idx < m_num_xcells);
+	return i_idx*m_num_xcells + j_idx;
+}
 
 void GameWorld::update(double time_elapsed) {
+	for (auto iter = m_cells.begin(); iter != m_cells.end(); ++iter) {
+		(*iter).clear();
+	}
+	for (auto iter = m_agents.begin(); iter != m_agents.end(); ++iter) {
+		int cell_id = get_cell_id((*iter)->pos());
+		m_cells[cell_id].push_back(*iter);
+	}
 	for (auto iter = m_agents.begin(); iter != m_agents.end(); ++iter) {
 		(*iter)->update(time_elapsed);
 	}
 }
 
 void GameWorld::render() {
+	static unsigned int render_cnt;
+	static unsigned int prev_cnt;
+	static clock_t prev_clock;
+	static unsigned int num_render;
+
+	my_gdi.reset_text_auto_pos();
+	TCHAR buf[512];
+	int text_len;
+
+	++render_cnt;
+	clock_t clock_now = clock();
+	if (clock_now - prev_clock >= CLOCKS_PER_SEC*10) {
+		num_render = render_cnt - prev_cnt;
+		prev_cnt = render_cnt;
+		prev_clock = clock_now;
+	}
+	text_len = wsprintf(buf, TEXT("%d.%d frames per second"), num_render / 10, num_render - (num_render / 10) * 10);
+	my_gdi.draw_text_auto_pos(buf, text_len);
+
 	//SetMapMode(hdc, MM_ANISOTROPIC);
 	//SetWindowExtEx(hdc, m_width / 2, m_height / 2, nullptr);
 	//SetViewportExtEx(hdc, m_width / 2, -m_height / 2, nullptr);
@@ -58,9 +94,6 @@ void GameWorld::render() {
 
 	for (auto iter = m_obstacles.begin(); iter != m_obstacles.end(); ++iter) (*iter)->render();
 
-	my_gdi.reset_text_auto_pos();
-	TCHAR buf[512];
-	int text_len;
 	text_len = wsprintf(buf, TEXT("Time Quantum = %d ms"), my_config.time_quantum());
 	my_gdi.draw_text_auto_pos(buf, text_len);
 	text_len = wsprintf(buf, TEXT("Time Delta = %d ms  Left(-) / Right(+)"), my_config.time_delta());

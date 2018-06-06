@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="AppParam.h" />
     <ClInclude Include="BaseGameEntity.h" />
+    <ClInclude Include="Cell.h" />
     <ClInclude Include="EntityFunctionTemplates.h" />
     <ClInclude Include="GameWorld.h" />
     <ClInclude Include="Geometry.h" />
@@ -170,6 +171,7 @@
   <ItemGroup>
     <ClCompile Include="AppParam.cpp" />
     <ClCompile Include="BaseGameEntity.cpp" />
+    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="GameWorld.cpp" />
     <ClCompile Include="IniFileLoader.cpp" />
     <ClCompile Include="MovingEntity.cpp" />
